@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lifecycleMappingMetadata>
+	<pluginExecutions>
+		
+		<!-- pluginExecutions, déclaré ici pour être exécuté automatiquement si le
+		plugin maven correspondant est utilisé. Commenté pour laisser la déclaration
+		directement dans le pom du projet concerné -->
+		
+		<!--
+		<pluginExecution>
+			<pluginExecutionFilter>
+				<groupId>com.github.maven-nar</groupId>
+				<artifactId>nar-maven-plugin</artifactId>
+				<versionRange>[3.2.2,)</versionRange>
+				<goals>
+					<goal>nar-validate</goal>
+				</goals>
+			</pluginExecutionFilter>
+			<action>
+				<configurator>
+					<id>org.dugilos.m2e.nar.narConfigurator</id>
+				</configurator>
+			</action>
+		</pluginExecution>
+		-->
+		
+	</pluginExecutions>
+</lifecycleMappingMetadata>

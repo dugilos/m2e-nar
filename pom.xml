@@ -1,0 +1,456 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<!-- http://wiki.eclipse.org/M2E/Extension_Development -->
+	<!-- http://www.eclipse.org/articles/article.php?file=Article-Eclipse-and-Maven2/index.html -->
+	<!-- https://gwt-m2e.googlecode.com/git/com.levigo.m2e.gwt/ -->
+
+	<groupId>org.dugilos.m2e</groupId>
+	<artifactId>org.dugilos.m2e.nar.parent</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<packaging>pom</packaging>
+
+	<properties>
+		<!-- tycho -->
+		<tychoVersion>0.20.0</tychoVersion>
+		<!-- <tycho-extras-version>${tycho-version}</tycho-extras-version> -->
+		<!-- <tycho.test.jvmArgs>-Xmx512m -XX:MaxPermSize=256m</tycho.test.jvmArgs> -->
+		
+		<!-- tycho-support configuration -->
+		<!-- <repositoryPathId>m2eclipse-nar</repositoryPathId> -->
+		<p2MetadataName>M2E Nar Connector</p2MetadataName>
+		
+		
+		
+		<!-- repositories url -->
+		<eclipse.target>luna</eclipse.target>
+		<eclipse-repo.url>http://download.eclipse.org/releases/${eclipse.target}</eclipse-repo.url>
+		
+		<eclipse-cdt.version>8.6</eclipse-cdt.version>
+		<eclipse-cdt-repo.url>http://download.eclipse.org/tools/cdt/releases/${eclipse-cdt.version}/</eclipse-cdt-repo.url>
+		
+		<!-- <m2e-releases-repo.url>http://download.eclipse.org/technology/m2e/releases</m2e-releases-repo.url> -->
+		
+		<!-- plugin deploy configuration -->
+		<!-- <deployServerId></deployServerId> -->
+		<!-- <repositoryUrl></repositoryUrl> -->
+		<!-- <repositoryPath></repositoryPath> -->
+		
+	</properties>
+
+	<repositories>
+		
+		<repository>
+			<id>eclipse</id>
+			<layout>p2</layout>
+			<url>${eclipse-repo.url}</url>
+		</repository>
+		 
+		<repository>
+			<id>eclipse-cdt</id>
+			<layout>p2</layout>
+			<url>${eclipse-cdt-repo.url}</url>
+		</repository>
+		
+		<!-- 
+		<repository>
+			<id>m2e-tests</id>
+			<url>${m2e-releases-repo.url}</url>
+			<layout>p2</layout>
+		</repository>
+		 -->
+	</repositories>
+
+	<modules>
+		<module>org.dugilos.m2e.nar</module>
+		<module>org.dugilos.m2e.nar.feature</module>
+		<!-- <module>org.dugilos.m2e.nar.tests</module> -->
+	</modules>
+	
+	
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-maven-plugin</artifactId>
+				<version>${tychoVersion}</version>
+				<extensions>true</extensions>
+			</plugin>
+			
+			<!-- 
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-source-plugin</artifactId>
+				<version>${tychoVersion}</version>
+				<executions>
+					<execution>
+						<id>plugin-source</id>
+						<goals>
+							<goal>plugin-source</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			 -->
+			
+			<!-- 
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>target-platform-configuration</artifactId>
+				<version>${tychoVersion}</version>
+				<configuration>
+					
+					<resolver>p2</resolver>
+					<ignoreTychoRepositories>true</ignoreTychoRepositories>
+					
+					<!- - 
+					<environments>
+						<environment>
+							<os>linux</os>
+							<ws>gtk</ws>
+							<arch>x86</arch>
+						</environment>
+						<environment>
+							<os>linux</os>
+							<ws>gtk</ws>
+							<arch>x86_64</arch>
+						</environment>
+						<environment>
+							<os>win32</os>
+							<ws>win32</ws>
+							<arch>x86</arch>
+						</environment>
+						<environment>
+							<os>win32</os>
+							<ws>win32</ws>
+							<arch>x86_64</arch>
+						</environment>
+						
+						<environment>
+							<os>macosx</os>
+							<ws>cocoa</ws>
+							<arch>x86_64</arch>
+						</environment>
+						
+					</environments>
+					- ->
+				</configuration>
+			</plugin>
+			 -->
+			
+			
+			
+			
+			
+			<!--
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-source-plugin</artifactId>
+				<version>${tychoVersion}</version>
+				<executions>
+					<execution>
+						<id>plugin-source</id>
+						<goals>
+							<goal>plugin-source</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			-->
+			<!-- 
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-packaging-plugin</artifactId>
+				<version>${tychoVersion}</version>
+				<configuration>
+					<format>yyyyMMdd-HHmm</format>
+					<sourceReferences>
+						<generate>false</generate>
+					</sourceReferences>
+				</configuration>
+				<dependencies>
+				 -->
+					<!--
+					<dependency>
+						<groupId>org.eclipse.tycho.extras</groupId>
+						<artifactId>tycho-sourceref-jgit</artifactId>
+						<version>${tycho-extras-version}</version>
+					</dependency>
+					-->
+					<!-- 
+				</dependencies>
+			</plugin>
+			-->
+		</plugins>
+		
+		<pluginManagement>
+			<plugins>
+				
+				
+				
+				<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+				<plugin>
+					<groupId>org.eclipse.m2e</groupId>
+					<artifactId>lifecycle-mapping</artifactId>
+					<version>1.0.0</version>
+					<configuration>
+						<lifecycleMappingMetadata>
+							<pluginExecutions>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>org.eclipse.tycho</groupId>
+										<artifactId>tycho-compiler-plugin</artifactId>
+										<versionRange>[${tychoVersion},)</versionRange>
+										<goals>
+											<goal>compile</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore></ignore>
+									</action>
+								</pluginExecution>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>org.eclipse.tycho</groupId>
+										<artifactId>tycho-packaging-plugin</artifactId>
+										<versionRange>[${tychoVersion},)</versionRange>
+										<goals>
+											<goal>validate-id</goal>
+											<goal>build-qualifier</goal>
+											<goal>validate-version</goal>
+											<goal>build-qualifier-aggregator</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore></ignore>
+									</action>
+								</pluginExecution>
+							</pluginExecutions>
+						</lifecycleMappingMetadata>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+		
+	</build>
+
+	<profiles>
+		
+		<profile>
+			<id>sign</id>
+			<activation>
+				<property>
+					<name>jarsigner.alias</name>
+				</property>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-jarsigner-plugin</artifactId>
+						<version>1.2</version>
+						<executions>
+							<execution>
+								<id>sign</id>
+								<goals>
+									<goal>sign</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		
+		<profile>
+			<id>deploy</id>
+			<activation>
+				<file>
+					<missing>.tycho-support</missing>
+				</file>
+			</activation>
+			<build>
+				<pluginManagement>
+					<plugins>
+						<!--
+						We only care about deploying the update site. Disable the deployment of the standard
+						Maven resources and only deploy the update site in the feature build which is defined
+						in the feature-build profile below.
+						-->
+						<plugin>
+							<groupId>org.apache.maven.plugins</groupId>
+							<artifactId>maven-deploy-plugin</artifactId>
+							<configuration>
+								<skip>true</skip>
+							</configuration>
+						</plugin>
+					</plugins>
+				</pluginManagement>
+			</build>
+		</profile>
+		
+		<!--
+		Feature build profile will only be activated in the presence of a feature.xml file in
+		the base directory of the project.
+		-->
+		<profile>
+			<id>feature-build</id>
+			<activation>
+				<file>
+					<exists>feature.xml</exists>
+				</file>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.eclipse.tycho</groupId>
+						<artifactId>tycho-packaging-plugin</artifactId>
+						<version>${tychoVersion}</version>
+						<configuration>
+							<deployableFeature>true</deployableFeature>
+						</configuration>
+					</plugin>
+					<plugin>
+						<groupId>org.eclipse.tycho</groupId>
+						<artifactId>tycho-p2-plugin</artifactId>
+						<version>${tychoVersion}</version>
+						<executions>
+							<execution>
+								<id>categorization</id>
+								<phase>package</phase>
+								<goals>
+									<goal>category-p2-metadata</goal>
+								</goals>
+							</execution>
+						</executions>
+						<configuration>
+							<metadataRepositoryName>${p2MetadataName}</metadataRepositoryName>
+							<artifactRepositoryName>${p2MetadataName}</artifactRepositoryName>
+						</configuration>
+					</plugin>
+					<plugin>
+						<groupId>io.tesla.tycho</groupId>
+						<artifactId>feature-zip-plugin</artifactId>
+						<version>0.0.1</version>
+						<configuration>
+							<sourceDirectory>${project.build.directory}/site</sourceDirectory>
+							<zip>${project.build.directory}/${project.artifactId}-${project.version}-site.zip</zip>
+						</configuration>
+						<executions>
+							<execution>
+								<id>feature-zip</id>
+								<phase>package</phase>
+								<goals>
+									<goal>zip</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+					<!-- Deploy the update site zip to the server using the maven-upload-plugin. -->
+					<!--
+					<plugin>
+						<groupId>org.sonatype.plugins</groupId>
+						<artifactId>maven-upload-plugin</artifactId>
+						<version>0.0.1</version>
+						<executions>
+							<execution>
+								<id>publish-site</id>
+								<phase>deploy</phase>
+								<goals>
+									<goal>upload-file</goal>
+								</goals>
+								<configuration>
+									<file>${project.build.directory}/${project.artifactId}-${project.version}-site.zip</file>
+									<serverId>${deployServerId}</serverId>
+									<repositoryUrl>${repositoryUrl}</repositoryUrl>
+									<repositoryPath>${repositoryPath}</repositoryPath>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					-->
+				</plugins>
+			</build>
+		</profile>
+		
+		<!--
+		Site build profile will only be activated in the presence of a site.xml file in
+		the base directory of the project.
+		-->
+		<profile>
+			<id>site-build</id>
+			<activation>
+				<file>
+					<exists>site.xml</exists>
+				</file>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.eclipse.tycho</groupId>
+						<artifactId>tycho-packaging-plugin</artifactId>
+						<version>${tychoVersion}</version>
+						<executions>
+							<execution>
+								<id>build-qualifier</id>
+								<goals>
+									<goal>build-qualifier</goal>
+								</goals>
+								<phase>validate</phase>
+							</execution>
+						</executions>
+						<configuration>
+							<metadataRepositoryName>${p2MetadataName}</metadataRepositoryName>
+							<artifactRepositoryName>${p2MetadataName}</artifactRepositoryName>
+						</configuration>
+					</plugin>
+					<plugin>
+						<groupId>io.tesla.tycho</groupId>
+						<artifactId>feature-zip-plugin</artifactId>
+						<version>0.0.1</version>
+						<configuration>
+							<sourceDirectory>${project.build.directory}/site</sourceDirectory>
+							<zip>${project.build.directory}/${project.artifactId}-${project.version}-site.zip</zip>
+						</configuration>
+						<executions>
+							<execution>
+								<id>feature-zip</id>
+								<phase>package</phase>
+								<goals>
+									<goal>zip</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+					<!-- Deploy the update site zip to the server using the maven-upload-plugin. -->
+					<!--
+					<plugin>
+						<groupId>org.sonatype.plugins</groupId>
+						<artifactId>maven-upload-plugin</artifactId>
+						<version>0.0.1</version>
+						<executions>
+							<execution>
+								<id>publish-site</id>
+								<phase>deploy</phase>
+								<goals>
+									<goal>upload-file</goal>
+								</goals>
+								<configuration>
+									<file>${project.build.directory}/${project.artifactId}-${project.version}-site.zip</file>
+									<serverId>${deployServerId}</serverId>
+									<repositoryUrl>${repositoryUrl}</repositoryUrl>
+									<repositoryPath>${repositoryPath}</repositoryPath>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					-->
+				</plugins>
+			</build>
+		</profile>
+		
+	</profiles>
+	
+</project>

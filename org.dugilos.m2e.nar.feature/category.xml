@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <feature url="features/org.dugilos.m2e.nar.feature_0.0.1.qualifier.jar" id="org.dugilos.m2e.nar.feature" version="0.0.1.qualifier">
+      <category name="m2eclipse-nar"/>
+   </feature>
+   <category-def name="m2eclipse-nar" label="M2E Nar Connector"/>
+</site>
