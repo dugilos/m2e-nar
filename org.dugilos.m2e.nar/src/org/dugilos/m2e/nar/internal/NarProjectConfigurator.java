@@ -731,7 +731,7 @@ public class NarProjectConfigurator extends AbstractProjectConfigurator {
 //		}
 		
 		String sourceDirectory;
-//		List<String> includePaths;
+		List<String> includePaths;
 		
 		// Add c++ source directories
 		sourceDirectory = narPluginConfiguration.getAbsoluteCppSourceDirectory();
@@ -742,12 +742,12 @@ public class NarProjectConfigurator extends AbstractProjectConfigurator {
 		srcEntry = buildCSourceEntry(absoluteProjectBaseDir, workspaceRelativeProjectBaseDir, sourceDirectory, exclusionPatterns);
 		addCSourceEntry(listSourceEntry, srcEntry);
 
-//		// Add c++ include paths as source directories
-//		includePaths = narPluginConfiguration.getAbsoluteCppIncludePaths();
-//		for(String includePath : includePaths) {
-//			srcEntry = buildCSourceEntry(absoluteProjectBaseDir, workspaceRelativeProjectBaseDir, includePath, exclusionPatterns);
-//			addCSourceEntry(listSourceEntry, srcEntry);
-//		}
+		// Add c++ include paths as source directories
+		includePaths = narPluginConfiguration.getAbsoluteCppIncludePaths();
+		for(String includePath : includePaths) {
+			srcEntry = buildCSourceEntry(absoluteProjectBaseDir, workspaceRelativeProjectBaseDir, includePath, exclusionPatterns);
+			addCSourceEntry(listSourceEntry, srcEntry);
+		}
 
 		// Add c source directories
 		sourceDirectory = narPluginConfiguration.getAbsoluteCSourceDirectory();
@@ -758,12 +758,12 @@ public class NarProjectConfigurator extends AbstractProjectConfigurator {
 		srcEntry = buildCSourceEntry(absoluteProjectBaseDir, workspaceRelativeProjectBaseDir, sourceDirectory, exclusionPatterns);
 		addCSourceEntry(listSourceEntry, srcEntry);
 
-//		// Add c include paths as source directories
-//		includePaths = narPluginConfiguration.getAbsoluteCIncludePaths();
-//		for(String includePath : includePaths) {
-//			srcEntry = buildCSourceEntry(absoluteProjectBaseDir, workspaceRelativeProjectBaseDir, includePath, exclusionPatterns);
-//			addCSourceEntry(listSourceEntry, srcEntry);
-//		}
+		// Add c include paths as source directories
+		includePaths = narPluginConfiguration.getAbsoluteCIncludePaths();
+		for(String includePath : includePaths) {
+			srcEntry = buildCSourceEntry(absoluteProjectBaseDir, workspaceRelativeProjectBaseDir, includePath, exclusionPatterns);
+			addCSourceEntry(listSourceEntry, srcEntry);
+		}
 		
 		mavenConfDesc.setSourceEntries(listSourceEntry.toArray(new CSourceEntry[listSourceEntry.size()]));
 	}
