@@ -14,7 +14,7 @@
 
 	<properties>
 		<!-- tycho -->
-		<tychoVersion>0.20.0</tychoVersion>
+		<tychoVersion>0.22.0</tychoVersion>
 		<!-- <tycho-extras-version>${tycho-version}</tycho-extras-version> -->
 		<!-- <tycho.test.jvmArgs>-Xmx512m -XX:MaxPermSize=256m</tycho.test.jvmArgs> -->
 		
@@ -95,28 +95,17 @@
 			</plugin>
 			 -->
 			
-			<!-- 
 			<plugin>
 				<groupId>org.eclipse.tycho</groupId>
 				<artifactId>target-platform-configuration</artifactId>
 				<version>${tychoVersion}</version>
 				<configuration>
-					
 					<resolver>p2</resolver>
 					<ignoreTychoRepositories>true</ignoreTychoRepositories>
+					<pomDependencies>consider</pomDependencies>
 					
-					<!- - 
+					<!-- 
 					<environments>
-						<environment>
-							<os>linux</os>
-							<ws>gtk</ws>
-							<arch>x86</arch>
-						</environment>
-						<environment>
-							<os>linux</os>
-							<ws>gtk</ws>
-							<arch>x86_64</arch>
-						</environment>
 						<environment>
 							<os>win32</os>
 							<ws>win32</ws>
@@ -128,37 +117,28 @@
 							<arch>x86_64</arch>
 						</environment>
 						
+						<environment>
+							<os>linux</os>
+							<ws>gtk</ws>
+							<arch>x86</arch>
+						</environment>
+						<environment>
+							<os>linux</os>
+							<ws>gtk</ws>
+							<arch>x86_64</arch>
+						</environment>
+
 						<environment>
 							<os>macosx</os>
 							<ws>cocoa</ws>
 							<arch>x86_64</arch>
 						</environment>
-						
 					</environments>
-					- ->
+					 -->
 				</configuration>
 			</plugin>
-			 -->
 			
 			
-			
-			
-			
-			<!--
-			<plugin>
-				<groupId>org.eclipse.tycho</groupId>
-				<artifactId>tycho-source-plugin</artifactId>
-				<version>${tychoVersion}</version>
-				<executions>
-					<execution>
-						<id>plugin-source</id>
-						<goals>
-							<goal>plugin-source</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			-->
 			<!-- 
 			<plugin>
 				<groupId>org.eclipse.tycho</groupId>
@@ -171,15 +151,13 @@
 					</sourceReferences>
 				</configuration>
 				<dependencies>
-				 -->
-					<!--
+					<!- -
 					<dependency>
 						<groupId>org.eclipse.tycho.extras</groupId>
 						<artifactId>tycho-sourceref-jgit</artifactId>
 						<version>${tycho-extras-version}</version>
 					</dependency>
-					-->
-					<!-- 
+					- ->
 				</dependencies>
 			</plugin>
 			-->
@@ -238,6 +216,7 @@
 
 	<profiles>
 		
+		<!-- 
 		<profile>
 			<id>sign</id>
 			<activation>
@@ -263,6 +242,7 @@
 				</plugins>
 			</build>
 		</profile>
+		 -->
 		
 		<profile>
 			<id>deploy</id>

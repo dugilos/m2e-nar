@@ -192,11 +192,14 @@ public class NarPluginConfiguration {
 				mgtPluginDomConfig = Xpp3Dom.class.cast(MgtNarMavenPlugin.getConfiguration());
 			}
 			
-			if(pluginDomConfig != null) {
-				linkerName = getLinkerNameFromDomConfig(pluginDomConfig);
-			}
-			if(linkerName == null && mgtPluginDomConfig != null) {
+			if(mgtPluginDomConfig != null) {
 				linkerName = getLinkerNameFromDomConfig(mgtPluginDomConfig);
+			}
+			if(pluginDomConfig != null) {
+				String str = getLinkerNameFromDomConfig(pluginDomConfig);
+				if(str != null) {
+					linkerName = str;
+				}
 			}
 		} catch(ClassCastException e) {
 			int severity = IStatus.ERROR;
@@ -241,14 +244,17 @@ public class NarPluginConfiguration {
 			}
 			
 			String str = null;
+			if(mgtPluginDomConfig != null) {
+				str = getLayoutFromDomConfig(mgtPluginDomConfig);
+				if(str != null) {
+					layout = str;
+				}
+			}
 			if(pluginDomConfig != null) {
 				str = getLayoutFromDomConfig(pluginDomConfig);
-			}
-			if(str == null && mgtPluginDomConfig != null) {
-				str = getLayoutFromDomConfig(mgtPluginDomConfig);
-			}
-			if(str != null) {
-				layout = str;
+				if(str != null) {
+					layout = str;
+				}
 			}
 		} catch(ClassCastException e) {
 			int severity = IStatus.ERROR;
@@ -390,15 +396,19 @@ public class NarPluginConfiguration {
 			}
 			
 			String str = null;
+			if(mgtPluginDomConfig != null) {
+				str = getFirstLibraryTypeFromDomConfig(mgtPluginDomConfig);
+				if(str != null) {
+					libraryType = str;
+				}
+			}
 			if(pluginDomConfig != null) {
 				str = getFirstLibraryTypeFromDomConfig(pluginDomConfig);
+				if(str != null) {
+					libraryType = str;
+				}
 			}
-			if(str == null && mgtPluginDomConfig != null) {
-				str = getFirstLibraryTypeFromDomConfig(mgtPluginDomConfig);
-			}
-			if(str != null) {
-				libraryType = str;
-			}
+			
 		} catch(ClassCastException e) {
 			int severity = IStatus.ERROR;
 			Status status = new Status(severity, pluginId, e.getMessage(), e);
@@ -443,15 +453,19 @@ public class NarPluginConfiguration {
 			}
 			
 			Boolean b = null;
+			if(mgtPluginDomConfig != null) {
+				b = getDebugFromDomConfig(mgtPluginDomConfig);
+				if(b != null) {
+					debug = b.booleanValue();
+				}
+			}
 			if(pluginDomConfig != null) {
 				b = getDebugFromDomConfig(pluginDomConfig);
+				if(b != null) {
+					debug = b.booleanValue();
+				}
 			}
-			if(b == null && mgtPluginDomConfig != null) {
-				b = getDebugFromDomConfig(mgtPluginDomConfig);
-			}
-			if(b != null) {
-				debug = b.booleanValue();
-			}
+			
 		} catch(ClassCastException e) {
 			int severity = IStatus.ERROR;
 			Status status = new Status(severity, pluginId, e.getMessage(), e);
@@ -510,19 +524,24 @@ public class NarPluginConfiguration {
 			}
 			
 			String src = null;
+			if(mgtPluginDomConfig != null) {
+				src = getAbsoluteSourceDirectoryFromDomConfig("cpp", "sourceDirectory", mgtPluginDomConfig);
+				if(src != null) {
+					sourceDirectory = src;
+				}
+			}
 			if(pluginDomConfig != null) {
 				src = getAbsoluteSourceDirectoryFromDomConfig("cpp", "sourceDirectory", pluginDomConfig);
+				if(src != null) {
+					sourceDirectory = src;
+				}
 			}
-			if(src == null && mgtPluginDomConfig != null) {
-				src = getAbsoluteSourceDirectoryFromDomConfig("cpp", "sourceDirectory", mgtPluginDomConfig);
-			}
-			if(src != null) {
-				sourceDirectory = src;
-			} else {
+			if(sourceDirectory == null) {
 				// default c++ source directory
 				File absoluteSrcDir = new File(absoluteProjectBaseDir, DEFAULT_RELATIVE_SOURCE_DIRECTORY);
 				sourceDirectory = absoluteSrcDir.getPath();
 			}
+			
 		} catch(ClassCastException e) {
 			int severity = IStatus.ERROR;
 			Status status = new Status(severity, pluginId, e.getMessage(), e);
@@ -542,21 +561,26 @@ public class NarPluginConfiguration {
 			if(MgtNarMavenPlugin != null) {
 				mgtPluginDomConfig = Xpp3Dom.class.cast(MgtNarMavenPlugin.getConfiguration());
 			}
-			
+
 			String src = null;
+			if(mgtPluginDomConfig != null) {
+				src = getAbsoluteSourceDirectoryFromDomConfig("c", "sourceDirectory", mgtPluginDomConfig);
+				if(src != null) {
+					sourceDirectory = src;
+				}
+			}
 			if(pluginDomConfig != null) {
 				src = getAbsoluteSourceDirectoryFromDomConfig("c", "sourceDirectory", pluginDomConfig);
+				if(src != null) {
+					sourceDirectory = src;
+				}
 			}
-			if(src == null && mgtPluginDomConfig != null) {
-				src = getAbsoluteSourceDirectoryFromDomConfig("c", "sourceDirectory", mgtPluginDomConfig);
-			}
-			if(src != null) {
-				sourceDirectory = src;
-			} else {
+			if(sourceDirectory == null) {
 				// default c source directory
 				File absoluteSrcDir = new File(absoluteProjectBaseDir, DEFAULT_RELATIVE_SOURCE_DIRECTORY);
 				sourceDirectory = absoluteSrcDir.getPath();
 			}
+			
 		} catch(ClassCastException e) {
 			int severity = IStatus.ERROR;
 			Status status = new Status(severity, pluginId, e.getMessage(), e);
@@ -576,21 +600,26 @@ public class NarPluginConfiguration {
 			if(MgtNarMavenPlugin != null) {
 				mgtPluginDomConfig = Xpp3Dom.class.cast(MgtNarMavenPlugin.getConfiguration());
 			}
-			
+
 			String src = null;
+			if(mgtPluginDomConfig != null) {
+				src = getAbsoluteSourceDirectoryFromDomConfig("cpp", "testSourceDirectory", mgtPluginDomConfig);
+				if(src != null) {
+					sourceDirectory = src;
+				}
+			}
 			if(pluginDomConfig != null) {
 				src = getAbsoluteSourceDirectoryFromDomConfig("cpp", "testSourceDirectory", pluginDomConfig);
+				if(src != null) {
+					sourceDirectory = src;
+				}
 			}
-			if(src == null && mgtPluginDomConfig != null) {
-				src = getAbsoluteSourceDirectoryFromDomConfig("cpp", "testSourceDirectory", mgtPluginDomConfig);
-			}
-			if(src != null) {
-				sourceDirectory = src;
-			} else {
+			if(sourceDirectory == null) {
 				// default c++ test source directory
 				File absoluteSrcDir = new File(absoluteProjectBaseDir, DEFAULT_RELATIVE_TEST_SOURCE_DIRECTORY);
 				sourceDirectory = absoluteSrcDir.getPath();
 			}
+			
 		} catch(ClassCastException e) {
 			int severity = IStatus.ERROR;
 			Status status = new Status(severity, pluginId, e.getMessage(), e);
@@ -610,21 +639,26 @@ public class NarPluginConfiguration {
 			if(MgtNarMavenPlugin != null) {
 				mgtPluginDomConfig = Xpp3Dom.class.cast(MgtNarMavenPlugin.getConfiguration());
 			}
-			
+
 			String src = null;
+			if(mgtPluginDomConfig != null) {
+				src = getAbsoluteSourceDirectoryFromDomConfig("c", "testSourceDirectory", mgtPluginDomConfig);
+				if(src != null) {
+					sourceDirectory = src;
+				}
+			}
 			if(pluginDomConfig != null) {
 				src = getAbsoluteSourceDirectoryFromDomConfig("c", "testSourceDirectory", pluginDomConfig);
+				if(src != null) {
+					sourceDirectory = src;
+				}
 			}
-			if(src == null && mgtPluginDomConfig != null) {
-				src = getAbsoluteSourceDirectoryFromDomConfig("c", "testSourceDirectory", mgtPluginDomConfig);
-			}
-			if(src != null) {
-				sourceDirectory = src;
-			} else {
+			if(sourceDirectory == null) {
 				// default c test source directory
 				File absoluteSrcDir = new File(absoluteProjectBaseDir, DEFAULT_RELATIVE_TEST_SOURCE_DIRECTORY);
 				sourceDirectory = absoluteSrcDir.getPath();
 			}
+			
 		} catch(ClassCastException e) {
 			int severity = IStatus.ERROR;
 			Status status = new Status(severity, pluginId, e.getMessage(), e);
@@ -672,19 +706,26 @@ public class NarPluginConfiguration {
 			}
 			
 			List<String> list = null;
+			if(mgtPluginDomConfig != null) {
+				list = getAbsoluteIncludePathsFromDomConfig("cpp", mgtPluginDomConfig);
+				if(list != null) {
+					includes.addAll(list);
+				}
+			}
 			if(pluginDomConfig != null) {
 				list = getAbsoluteIncludePathsFromDomConfig("cpp", pluginDomConfig);
+				if(list != null) {
+					//TODO check list override from mgt plugin and plugin
+					includes.clear();
+					includes.addAll(list);
+				}
 			}
-			if(list == null && mgtPluginDomConfig != null) {
-				list = getAbsoluteIncludePathsFromDomConfig("cpp", mgtPluginDomConfig);
-			}
-			if(list != null) {
-				includes.addAll(list);
-			} else {
+			if(includes.isEmpty()) {
 				// default c++ include path
 				File file = new File(getAbsoluteCppSourceDirectory(), DEFAULT_RELATIVE_INCLUDE_DIRECTORY);
 				includes.add(file.getPath());
 			}
+			
 		} catch(ClassCastException e) {
 			int severity = IStatus.ERROR;
 			Status status = new Status(severity, pluginId, e.getMessage(), e);
@@ -704,21 +745,28 @@ public class NarPluginConfiguration {
 			if(MgtNarMavenPlugin != null) {
 				mgtPluginDomConfig = Xpp3Dom.class.cast(MgtNarMavenPlugin.getConfiguration());
 			}
-			
+
 			List<String> list = null;
+			if(mgtPluginDomConfig != null) {
+				list = getAbsoluteIncludePathsFromDomConfig("c", mgtPluginDomConfig);
+				if(list != null) {
+					includes.addAll(list);
+				}
+			}
 			if(pluginDomConfig != null) {
 				list = getAbsoluteIncludePathsFromDomConfig("c", pluginDomConfig);
+				if(list != null) {
+					//TODO check list override from mgt plugin and plugin
+					includes.clear();
+					includes.addAll(list);
+				}
 			}
-			if(list == null && mgtPluginDomConfig != null) {
-				list = getAbsoluteIncludePathsFromDomConfig("c", mgtPluginDomConfig);
-			}
-			if(list != null) {
-				includes.addAll(list);
-			} else {
+			if(includes.isEmpty()) {
 				// default c include path
-				File file = new File(getAbsoluteCSourceDirectory(), DEFAULT_RELATIVE_INCLUDE_DIRECTORY);
+				File file = new File(getAbsoluteCppSourceDirectory(), DEFAULT_RELATIVE_INCLUDE_DIRECTORY);
 				includes.add(file.getPath());
 			}
+			
 		} catch(ClassCastException e) {
 			int severity = IStatus.ERROR;
 			Status status = new Status(severity, pluginId, e.getMessage(), e);
@@ -776,15 +824,21 @@ public class NarPluginConfiguration {
 			}
 			
 			List<String> list = null;
+			if(mgtPluginDomConfig != null) {
+				list = getSystemIncludePathsFromDomConfig("cpp", mgtPluginDomConfig);
+				if(list != null) {
+					includes.addAll(list);
+				}
+			}
 			if(pluginDomConfig != null) {
 				list = getSystemIncludePathsFromDomConfig("cpp", pluginDomConfig);
+				if(list != null) {
+					//TODO check list override from mgt plugin and plugin
+					includes.clear();
+					includes.addAll(list);
+				}
 			}
-			if(list == null && mgtPluginDomConfig != null) {
-				list = getSystemIncludePathsFromDomConfig("cpp", mgtPluginDomConfig);
-			}
-			if(list != null) {
-				includes.addAll(list);
-			}
+			
 		} catch(ClassCastException e) {
 			int severity = IStatus.ERROR;
 			Status status = new Status(severity, pluginId, e.getMessage(), e);
@@ -804,17 +858,23 @@ public class NarPluginConfiguration {
 			if(MgtNarMavenPlugin != null) {
 				mgtPluginDomConfig = Xpp3Dom.class.cast(MgtNarMavenPlugin.getConfiguration());
 			}
-			
+
 			List<String> list = null;
+			if(mgtPluginDomConfig != null) {
+				list = getSystemIncludePathsFromDomConfig("c", mgtPluginDomConfig);
+				if(list != null) {
+					includes.addAll(list);
+				}
+			}
 			if(pluginDomConfig != null) {
 				list = getSystemIncludePathsFromDomConfig("c", pluginDomConfig);
+				if(list != null) {
+					//TODO check list override from mgt plugin and plugin
+					includes.clear();
+					includes.addAll(list);
+				}
 			}
-			if(list == null && mgtPluginDomConfig != null) {
-				list = getSystemIncludePathsFromDomConfig("c", mgtPluginDomConfig);
-			}
-			if(list != null) {
-				includes.addAll(list);
-			}
+			
 		} catch(ClassCastException e) {
 			int severity = IStatus.ERROR;
 			Status status = new Status(severity, pluginId, e.getMessage(), e);
@@ -861,15 +921,21 @@ public class NarPluginConfiguration {
 			}
 			
 			Map<String, String> map = null;
+			if(mgtPluginDomConfig != null) {
+				map = getDefinesFromDomConfig("cpp", "defines", mgtPluginDomConfig);
+				if(map != null) {
+					macros.putAll(map);
+				}
+			}
 			if(pluginDomConfig != null) {
 				map = getDefinesFromDomConfig("cpp", "defines", pluginDomConfig);
+				if(map != null) {
+					//TODO check list override from mgt plugin and plugin
+					macros.clear();
+					macros.putAll(map);
+				}
 			}
-			if(map == null && mgtPluginDomConfig != null) {
-				map = getDefinesFromDomConfig("cpp", "defines", mgtPluginDomConfig);
-			}
-			if(map != null) {
-				macros.putAll(map);
-			}
+			
 		} catch(ClassCastException e) {
 			int severity = IStatus.ERROR;
 			Status status = new Status(severity, pluginId, e.getMessage(), e);
@@ -889,17 +955,23 @@ public class NarPluginConfiguration {
 			if(MgtNarMavenPlugin != null) {
 				mgtPluginDomConfig = Xpp3Dom.class.cast(MgtNarMavenPlugin.getConfiguration());
 			}
-			
+
 			Map<String, String> map = null;
+			if(mgtPluginDomConfig != null) {
+				map = getDefinesFromDomConfig("c", "defines", mgtPluginDomConfig);
+				if(map != null) {
+					macros.putAll(map);
+				}
+			}
 			if(pluginDomConfig != null) {
 				map = getDefinesFromDomConfig("c", "defines", pluginDomConfig);
+				if(map != null) {
+					//TODO check list override from mgt plugin and plugin
+					macros.clear();
+					macros.putAll(map);
+				}
 			}
-			if(map == null && mgtPluginDomConfig != null) {
-				map = getDefinesFromDomConfig("c", "defines", mgtPluginDomConfig);
-			}
-			if(map != null) {
-				macros.putAll(map);
-			}
+			
 		} catch(ClassCastException e) {
 			int severity = IStatus.ERROR;
 			Status status = new Status(severity, pluginId, e.getMessage(), e);
@@ -919,17 +991,23 @@ public class NarPluginConfiguration {
 			if(MgtNarMavenPlugin != null) {
 				mgtPluginDomConfig = Xpp3Dom.class.cast(MgtNarMavenPlugin.getConfiguration());
 			}
-			
+
 			Map<String, String> map = null;
+			if(mgtPluginDomConfig != null) {
+				map = getDefinesFromDomConfig("cpp", "undefines", mgtPluginDomConfig);
+				if(map != null) {
+					macros.putAll(map);
+				}
+			}
 			if(pluginDomConfig != null) {
 				map = getDefinesFromDomConfig("cpp", "undefines", pluginDomConfig);
+				if(map != null) {
+					//TODO check list override from mgt plugin and plugin
+					macros.clear();
+					macros.putAll(map);
+				}
 			}
-			if(map == null && mgtPluginDomConfig != null) {
-				map = getDefinesFromDomConfig("cpp", "undefines", mgtPluginDomConfig);
-			}
-			if(map != null) {
-				macros.putAll(map);
-			}
+			
 		} catch(ClassCastException e) {
 			int severity = IStatus.ERROR;
 			Status status = new Status(severity, pluginId, e.getMessage(), e);
@@ -949,17 +1027,23 @@ public class NarPluginConfiguration {
 			if(MgtNarMavenPlugin != null) {
 				mgtPluginDomConfig = Xpp3Dom.class.cast(MgtNarMavenPlugin.getConfiguration());
 			}
-			
+
 			Map<String, String> map = null;
+			if(mgtPluginDomConfig != null) {
+				map = getDefinesFromDomConfig("c", "undefines", mgtPluginDomConfig);
+				if(map != null) {
+					macros.putAll(map);
+				}
+			}
 			if(pluginDomConfig != null) {
 				map = getDefinesFromDomConfig("c", "undefines", pluginDomConfig);
+				if(map != null) {
+					//TODO check list override from mgt plugin and plugin
+					macros.clear();
+					macros.putAll(map);
+				}
 			}
-			if(map == null && mgtPluginDomConfig != null) {
-				map = getDefinesFromDomConfig("c", "undefines", mgtPluginDomConfig);
-			}
-			if(map != null) {
-				macros.putAll(map);
-			}
+			
 		} catch(ClassCastException e) {
 			int severity = IStatus.ERROR;
 			Status status = new Status(severity, pluginId, e.getMessage(), e);
@@ -1013,15 +1097,21 @@ public class NarPluginConfiguration {
 //			}
 //			
 //			List<String> list = null;
+//			if(mgtPluginDomConfig != null) {
+//				list = getIncludesExcludesFromDomConfig("cpp", "includes", mgtPluginDomConfig);
+//				if(list != null) {
+//					includes.addAll(list);
+//				}
+//			}
 //			if(pluginDomConfig != null) {
 //				list = getIncludesExcludesFromDomConfig("cpp", "includes", pluginDomConfig);
+//				if(list != null) {
+//					//TO DO check list override from mgt plugin and plugin
+//					includes.clear();
+//					includes.addAll(list);
+//				}
 //			}
-//			if(list == null && mgtPluginDomConfig != null) {
-//				list = getIncludesExcludesFromDomConfig("cpp", "includes", mgtPluginDomConfig);
-//			}
-//			if(list != null) {
-//				includes.addAll(list);
-//			}
+//			
 //		} catch(ClassCastException e) {
 //			int severity = IStatus.ERROR;
 //			Status status = new Status(severity, pluginId, e.getMessage(), e);
@@ -1041,17 +1131,23 @@ public class NarPluginConfiguration {
 //			if(MgtNarMavenPlugin != null) {
 //				mgtPluginDomConfig = Xpp3Dom.class.cast(MgtNarMavenPlugin.getConfiguration());
 //			}
-//			
+//
 //			List<String> list = null;
+//			if(mgtPluginDomConfig != null) {
+//				list = getIncludesExcludesFromDomConfig("c", "includes", mgtPluginDomConfig);
+//				if(list != null) {
+//					includes.addAll(list);
+//				}
+//			}
 //			if(pluginDomConfig != null) {
 //				list = getIncludesExcludesFromDomConfig("c", "includes", pluginDomConfig);
+//				if(list != null) {
+//					//TO DO check list override from mgt plugin and plugin
+//					includes.clear();
+//					includes.addAll(list);
+//				}
 //			}
-//			if(list == null && mgtPluginDomConfig != null) {
-//				list = getIncludesExcludesFromDomConfig("c", "includes", mgtPluginDomConfig);
-//			}
-//			if(list != null) {
-//				includes.addAll(list);
-//			}
+//			
 //		} catch(ClassCastException e) {
 //			int severity = IStatus.ERROR;
 //			Status status = new Status(severity, pluginId, e.getMessage(), e);
@@ -1071,17 +1167,23 @@ public class NarPluginConfiguration {
 //			if(MgtNarMavenPlugin != null) {
 //				mgtPluginDomConfig = Xpp3Dom.class.cast(MgtNarMavenPlugin.getConfiguration());
 //			}
-//			
+//
 //			List<String> list = null;
+//			if(mgtPluginDomConfig != null) {
+//				list = getIncludesExcludesFromDomConfig("cpp", "excludes", mgtPluginDomConfig);
+//				if(list != null) {
+//					excludes.addAll(list);
+//				}
+//			}
 //			if(pluginDomConfig != null) {
 //				list = getIncludesExcludesFromDomConfig("cpp", "excludes", pluginDomConfig);
+//				if(list != null) {
+//					//TO DO check list override from mgt plugin and plugin
+//					excludes.clear();
+//					excludes.addAll(list);
+//				}
 //			}
-//			if(list == null && mgtPluginDomConfig != null) {
-//				list = getIncludesExcludesFromDomConfig("cpp", "excludes", mgtPluginDomConfig);
-//			}
-//			if(list != null) {
-//				excludes.addAll(list);
-//			}
+//			
 //		} catch(ClassCastException e) {
 //			int severity = IStatus.ERROR;
 //			Status status = new Status(severity, pluginId, e.getMessage(), e);
@@ -1101,17 +1203,23 @@ public class NarPluginConfiguration {
 //			if(MgtNarMavenPlugin != null) {
 //				mgtPluginDomConfig = Xpp3Dom.class.cast(MgtNarMavenPlugin.getConfiguration());
 //			}
-//			
+//
 //			List<String> list = null;
+//			if(mgtPluginDomConfig != null) {
+//				list = getIncludesExcludesFromDomConfig("c", "excludes", mgtPluginDomConfig);
+//				if(list != null) {
+//					excludes.addAll(list);
+//				}
+//			}
 //			if(pluginDomConfig != null) {
 //				list = getIncludesExcludesFromDomConfig("c", "excludes", pluginDomConfig);
+//				if(list != null) {
+//					//TO DO check list override from mgt plugin and plugin
+//					excludes.clear();
+//					excludes.addAll(list);
+//				}
 //			}
-//			if(list == null && mgtPluginDomConfig != null) {
-//				list = getIncludesExcludesFromDomConfig("c", "excludes", mgtPluginDomConfig);
-//			}
-//			if(list != null) {
-//				excludes.addAll(list);
-//			}
+//			
 //		} catch(ClassCastException e) {
 //			int severity = IStatus.ERROR;
 //			Status status = new Status(severity, pluginId, e.getMessage(), e);
@@ -1120,7 +1228,6 @@ public class NarPluginConfiguration {
 //		
 //		return excludes;
 //	}
-//
 //
 //	private List<String> getIncludesExcludesFromDomConfig(String language, String type, Xpp3Dom domConfig) throws CoreException {
 //		try {
