@@ -31,7 +31,7 @@
          <mojo
             groupId="com.github.maven-nar"
             artifactId="nar-maven-plugin"
-            versionRange="[3.2.2,)"
+            versionRange="[3.2.3,)"
             goals="nar-validate">
             <configurator id="org.dugilos.m2e.nar.narConfigurator">
             </configurator>

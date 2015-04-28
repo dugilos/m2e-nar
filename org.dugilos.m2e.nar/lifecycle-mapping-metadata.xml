@@ -11,7 +11,7 @@
 			<pluginExecutionFilter>
 				<groupId>com.github.maven-nar</groupId>
 				<artifactId>nar-maven-plugin</artifactId>
-				<versionRange>[3.2.2,)</versionRange>
+				<versionRange>[3.2.3,)</versionRange>
 				<goals>
 					<goal>nar-validate</goal>
 				</goals>
