@@ -823,7 +823,7 @@ public class NarProjectConfigurator extends AbstractProjectConfigurator {
 		
 //		String sourceDirectory;
 		List<String> includePaths;
-		List<NarDependency> dependenciesProperties;
+		List<NarDependencyProperties> dependenciesProperties;
 		Map<String, String> macros;
 		Set<Entry<String, String>> entries;
 
@@ -861,15 +861,21 @@ public class NarProjectConfigurator extends AbstractProjectConfigurator {
 		
 		// Add dependencies include paths for c and c++ and dependencies as library path and library
 		dependenciesProperties = narPluginConfiguration.getCompileDependenciesProperties(log);
-		for(NarDependency dependencyProperties : dependenciesProperties) {
-			includePathEntry = buildCIncludePathEntry(absoluteProjectBaseDir, workspaceRelativeProjectBaseDir, dependencyProperties.getAbsoluteIncludePath());
-			addLanguageSettingEntry(cppIncludePathEntries, includePathEntry);
-			addLanguageSettingEntry(cIncludePathEntries, includePathEntry);
+		for(NarDependencyProperties dependencyProperties : dependenciesProperties) {
+			List<String> absoluteIncludePaths = dependencyProperties.getAbsoluteIncludePaths();
+			for(String absoluteIncludePath : absoluteIncludePaths) {
+				includePathEntry = buildCIncludePathEntry(absoluteProjectBaseDir, workspaceRelativeProjectBaseDir, absoluteIncludePath);
+				addLanguageSettingEntry(cppIncludePathEntries, includePathEntry);
+				addLanguageSettingEntry(cIncludePathEntries, includePathEntry);
+			}
 			
 			/*
-			libraryPathEntry = buildCLibraryPathEntry(absoluteProjectBaseDir, workspaceRelativeProjectBaseDir, dependencyProperties.getAbsoluteLibraryPath());
-			addLanguageSettingEntry(libraryPathEntries, libraryPathEntry);
-			
+			List<String> absoluteLibraryPaths = dependencyProperties.getAbsoluteLibraryPaths();
+			for(String absoluteLibraryPath : absoluteLibraryPaths) {
+				libraryPathEntry = buildCLibraryPathEntry(absoluteProjectBaseDir, workspaceRelativeProjectBaseDir, absoluteLibraryPath);
+				addLanguageSettingEntry(libraryPathEntries, libraryPathEntry);
+				
+			}
 			libraryFileEntry = new CLibraryFileEntry(dependencyProperties.getLibraryName(), CLibraryFileEntry.NONE);
 			addLanguageSettingEntry(libraryFileEntries, libraryFileEntry);
 			*/
@@ -877,15 +883,21 @@ public class NarProjectConfigurator extends AbstractProjectConfigurator {
 
 		// Add test dependencies include paths for c and c++ and test dependencies as library path and library
 		dependenciesProperties = narPluginConfiguration.getTestDependenciesProperties(log);
-		for(NarDependency dependencyProperties : dependenciesProperties) {
-			includePathEntry = buildCIncludePathEntry(absoluteProjectBaseDir, workspaceRelativeProjectBaseDir, dependencyProperties.getAbsoluteIncludePath());
-			addLanguageSettingEntry(cppIncludePathEntries, includePathEntry);
-			addLanguageSettingEntry(cIncludePathEntries, includePathEntry);
+		for(NarDependencyProperties dependencyProperties : dependenciesProperties) {
+			List<String> absoluteIncludePaths = dependencyProperties.getAbsoluteIncludePaths();
+			for(String absoluteIncludePath : absoluteIncludePaths) {
+				includePathEntry = buildCIncludePathEntry(absoluteProjectBaseDir, workspaceRelativeProjectBaseDir, absoluteIncludePath);
+				addLanguageSettingEntry(cppIncludePathEntries, includePathEntry);
+				addLanguageSettingEntry(cIncludePathEntries, includePathEntry);
+			}
 			
 			/*
-			libraryPathEntry = buildCLibraryPathEntry(absoluteProjectBaseDir, workspaceRelativeProjectBaseDir, dependencyProperties.getAbsoluteLibraryPath());
-			addLanguageSettingEntry(libraryPathEntries, libraryPathEntry);
-			
+			List<String> absoluteLibraryPaths = dependencyProperties.getAbsoluteLibraryPaths();
+			for(String absoluteLibraryPath : absoluteLibraryPaths) {
+				libraryPathEntry = buildCLibraryPathEntry(absoluteProjectBaseDir, workspaceRelativeProjectBaseDir, absoluteLibraryPath);
+				addLanguageSettingEntry(libraryPathEntries, libraryPathEntry);
+				
+			}
 			libraryFileEntry = new CLibraryFileEntry(dependencyProperties.getLibraryName(), CLibraryFileEntry.NONE);
 			addLanguageSettingEntry(libraryFileEntries, libraryFileEntry);
 			*/

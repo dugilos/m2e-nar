@@ -6,9 +6,12 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -23,9 +26,11 @@ import org.eclipse.core.runtime.Status;
 
 import com.github.maven_nar.AOL;
 import com.github.maven_nar.AbstractNarLayout;
+import com.github.maven_nar.AttachedNarArtifact;
 import com.github.maven_nar.Library;
 import com.github.maven_nar.Linker;
 import com.github.maven_nar.NarArtifact;
+import com.github.maven_nar.NarConstants;
 import com.github.maven_nar.NarLayout;
 import com.github.maven_nar.NarManager;
 import com.github.maven_nar.NarProperties;
@@ -297,24 +302,30 @@ public class NarPluginConfiguration {
 		return narLayout;
 	}
 
-	public List<NarDependency> getCompileDependenciesProperties(Log log) throws CoreException {
-		return getDependenciesProperties(Artifact.SCOPE_COMPILE, COMPILE_DEPENDENCIES_UNPACK_DIRECTORY, log);
+	public List<NarDependencyProperties> getCompileDependenciesProperties(Log log) throws CoreException {
+		List<String> scopes = new ArrayList<String>();
+		scopes.add(Artifact.SCOPE_COMPILE);
+		scopes.add(Artifact.SCOPE_PROVIDED);
+		scopes.add(Artifact.SCOPE_SYSTEM);
+		return getDependenciesProperties(scopes, COMPILE_DEPENDENCIES_UNPACK_DIRECTORY, log);
 	}
 
-	public List<NarDependency> getTestDependenciesProperties(Log log) throws CoreException {
-		return getDependenciesProperties(Artifact.SCOPE_TEST, TEST_DEPENDENCIES_UNPACK_DIRECTORY, log);
+	public List<NarDependencyProperties> getTestDependenciesProperties(Log log) throws CoreException {
+		List<String> scopes = new ArrayList<String>();
+		scopes.add(Artifact.SCOPE_TEST);
+		return getDependenciesProperties(scopes, TEST_DEPENDENCIES_UNPACK_DIRECTORY, log);
 	}
 	
 	@SuppressWarnings("unchecked")
-	private List<NarDependency> getDependenciesProperties(String scope, String unpackFolder, Log log) throws CoreException {
+	private List<NarDependencyProperties> getDependenciesProperties(List<String> scopes, String unpackFolder, Log log) throws CoreException {
 		
 		// get dependencies unpack directory
 		File unpackDirectory = new File(projectBuildDirectory, unpackFolder);
 		
-		// get nar dependencies
-		List<NarArtifact> narDependencies = null;
+		// get nar dependencies (this includes the dependencies from dependencies)
+		List<NarArtifact> narArtifacts = null;
 		try {
-			narDependencies = narManager.getNarDependencies(scope);
+			narArtifacts = narManager.getNarDependencies(scopes);
 		} catch (MojoExecutionException e) {
 			int severity = IStatus.ERROR;
 			Status status = new Status(severity, pluginId, e.getMessage(), e);
@@ -322,65 +333,144 @@ public class NarPluginConfiguration {
 		}
 		
 		// get nar dependencies paths
-		List<NarDependency> narDependenciesProperties = getNarDependenciesProperties(narDependencies, unpackDirectory, log);
+		List<NarDependencyProperties> narDependenciesProperties = getNarDependenciesProperties(narArtifacts, unpackDirectory, log);
 		
 		return narDependenciesProperties;
 	}
 
-	private List<NarDependency> getNarDependenciesProperties(List<NarArtifact> narDependencies, File unpackDirectory, Log log) throws CoreException {
-		List<NarDependency> narDependenciesProperties = new ArrayList<NarDependency>();
+	private List<NarDependencyProperties> getNarDependenciesProperties(List<NarArtifact> narArtifacts, File unpackDirectory, Log log) throws CoreException {
+		Map<String, NarDependencyProperties> mapNarDependenciesProperties = new HashMap<String, NarDependencyProperties>();
 		
-		for (Iterator<NarArtifact> it = narDependencies.iterator(); it.hasNext();) {
-			NarArtifact narDependency = it.next();
+		for (NarArtifact narArtifact : narArtifacts) {
 			
-			String binding = narDependency.getNarInfo().getBinding(aol, Library.NONE);
-			if (!binding.equals(Library.JNI) && !binding.equals(Library.NONE)) {
-				AOL narDependencyAol = narDependency.getNarInfo().getAOL(aol);
-				
-				String artifactId = narDependency.getArtifactId();
-				String version = narDependency.getVersion();
-				
+			String binding = narArtifact.getNarInfo().getBinding(aol, Library.NONE);
+			if (!binding.equals(Library.JNI) && !binding.equals(Library.NONE) && 
+					!binding.equals(Library.EXECUTABLE) && !binding.equals(Library.PLUGIN)) {
+
 				// build library name : artifactId-version
+				String artifactId = narArtifact.getArtifactId();
+				String version = narArtifact.getVersion();
 				String libraryName = artifactId + "-" + version;
 				
-				// Get include and library paths for the dependency
-				File includeDirectory = null;
-				File libDirectory = null;
-				try {
-					includeDirectory = narLayout.getIncludeDirectory(unpackDirectory, artifactId, version);
-					libDirectory = narLayout.getLibDirectory(unpackDirectory, artifactId, version, narDependencyAol.toString(), binding);
-				} catch (MojoFailureException e) {
-					int severity = IStatus.ERROR;
-					Status status = new Status(severity, pluginId, e.getMessage(), e);
-					throw new CoreException(status);
-				} catch (MojoExecutionException e) {
-					int severity = IStatus.ERROR;
-					Status status = new Status(severity, pluginId, e.getMessage(), e);
-					throw new CoreException(status);
-				}
-
-				// Convert the paths to absolute if thez are relative
-				String absoluteIncludePath;
-				if(includeDirectory.isAbsolute()) {
-					absoluteIncludePath = includeDirectory.getPath();
+				// create or get NarDependency object for the library
+				NarDependencyProperties narDependencyProperties = null;
+				if(mapNarDependenciesProperties.containsKey(libraryName)) {
+					narDependencyProperties = mapNarDependenciesProperties.get(libraryName);
 				} else {
-					File absoluteIncludeDir = new File(absoluteProjectBaseDir, includeDirectory.getPath());
-					absoluteIncludePath = absoluteIncludeDir.getPath();
-				}
-				String absoluteLibPath;
-				if(libDirectory.isAbsolute()) {
-					absoluteLibPath = libDirectory.getPath();
-				} else {
-					File absoluteLibDir = new File(absoluteProjectBaseDir, libDirectory.getPath());
-					absoluteLibPath = absoluteLibDir.getPath();
+					narDependencyProperties = new NarDependencyProperties(libraryName);
+					mapNarDependenciesProperties.put(libraryName, narDependencyProperties);
 				}
 				
-				NarDependency dependencyProperties = new NarDependency(libraryName, absoluteIncludePath, absoluteLibPath);
-				narDependenciesProperties.add(dependencyProperties);
+				// get noarch attached artifact(s)
+				List<AttachedNarArtifact> attachedNarArtifacts = getAttachedNarArtifacts(narArtifact, NarConstants.NAR_NO_ARCH);
+				for(AttachedNarArtifact attachedNarArtifact : attachedNarArtifacts) {
+					File includeDirectory = null;
+					try {
+						includeDirectory = narLayout.getIncludeDirectory(unpackDirectory,
+								attachedNarArtifact.getArtifactId(), attachedNarArtifact.getVersion());
+						// includeDirectory = {unpackDirectory}/{artifactId}-{version}-{classifier}/include
+					} catch (MojoFailureException e) {
+						int severity = IStatus.ERROR;
+						Status status = new Status(severity, pluginId, e.getMessage(), e);
+						throw new CoreException(status);
+					} catch (MojoExecutionException e) {
+						int severity = IStatus.ERROR;
+						Status status = new Status(severity, pluginId, e.getMessage(), e);
+						throw new CoreException(status);
+					}
+					// Convert the paths to absolute if it is relative
+					String absoluteIncludePath;
+					if(includeDirectory.isAbsolute()) {
+						absoluteIncludePath = includeDirectory.getPath();
+					} else {
+						File absoluteIncludeDir = new File(absoluteProjectBaseDir, includeDirectory.getPath());
+						absoluteIncludePath = absoluteIncludeDir.getPath();
+					}
+					narDependencyProperties.getAbsoluteIncludePaths().add(absoluteIncludePath);
+				}
+				
+				// get <binding> attached artifact(s)
+				attachedNarArtifacts = getAttachedNarArtifacts(narArtifact, binding);
+				for(AttachedNarArtifact attachedNarArtifact : attachedNarArtifacts) {
+					int aolEndIndex = attachedNarArtifact.getClassifier().lastIndexOf('-');
+					String attachedNarArtifactAol = attachedNarArtifact.getClassifier().substring(0, aolEndIndex);
+					File libDirectory = null;
+					try {
+						libDirectory = narLayout.getLibDirectory(unpackDirectory, 
+								attachedNarArtifact.getArtifactId(), attachedNarArtifact.getVersion(),
+								attachedNarArtifactAol, binding);
+						// libDirectory = {unpackDirectory}/{artifactId}-{version}-{classifier}/lib/{aol}/{binding}
+					} catch (MojoFailureException e) {
+						int severity = IStatus.ERROR;
+						Status status = new Status(severity, pluginId, e.getMessage(), e);
+						throw new CoreException(status);
+					} catch (MojoExecutionException e) {
+						int severity = IStatus.ERROR;
+						Status status = new Status(severity, pluginId, e.getMessage(), e);
+						throw new CoreException(status);
+					}
+					// Convert the paths to absolute if it is relative
+					String absoluteLibPath;
+					if(libDirectory.isAbsolute()) {
+						absoluteLibPath = libDirectory.getPath();
+					} else {
+						File absoluteLibDir = new File(absoluteProjectBaseDir, libDirectory.getPath());
+						absoluteLibPath = absoluteLibDir.getPath();
+					}
+					narDependencyProperties.getAbsoluteLibraryPaths().add(absoluteLibPath);
+				}
 			}
 		}
 		
+		List<NarDependencyProperties> narDependenciesProperties = new ArrayList<NarDependencyProperties>();
+		Set<Entry<String, NarDependencyProperties>> entriesNarDependenciesProperties = mapNarDependenciesProperties.entrySet();
+		for (Entry<String, NarDependencyProperties> entryNarDependenciesProperties : entriesNarDependenciesProperties) {
+			narDependenciesProperties.add(entryNarDependenciesProperties.getValue());
+		}
+		
 		return narDependenciesProperties;
+	}
+	
+	private List<AttachedNarArtifact> getAttachedNarArtifacts(NarArtifact narArtifact, String type) throws CoreException {
+		List<AttachedNarArtifact> attachedNarArtifacts = new ArrayList<AttachedNarArtifact>();
+		
+		// get artifact AOL
+		AOL narArtifactAol = narArtifact.getNarInfo().getAOL(aol);
+		
+		String[] attachedNarsFields = narArtifact.getNarInfo().getAttachedNars(narArtifactAol, type);
+		if(attachedNarsFields != null) {
+			for (int n = 0 ; n < attachedNarsFields.length ; n++) {
+				if (attachedNarsFields[n].isEmpty()) {
+					continue;
+				}
+				String[] attachedNarFields = attachedNarsFields[n].split(":", 5);
+				if (attachedNarFields.length >= 4) {
+					String attachedNarGroupId = attachedNarFields[0].trim();
+					String attachedNarArtifactId = attachedNarFields[1].trim();
+					String attachedNarType = attachedNarFields[2].trim();
+					String attachedNarClassifier = attachedNarFields[3].trim();
+					if ( narArtifactAol != null )
+					{
+						attachedNarClassifier = NarUtil.replace( "${aol}", narArtifactAol.toString(), attachedNarClassifier );
+					}
+					String attachedNarVersion = attachedNarFields.length >= 5 ? attachedNarFields[4].trim() : narArtifact.getBaseVersion();
+					
+					AttachedNarArtifact attachedNarArtifact = null;
+					try {
+						attachedNarArtifact = new AttachedNarArtifact(
+								attachedNarGroupId, attachedNarArtifactId, attachedNarVersion, narArtifact.getScope(),
+								attachedNarType, attachedNarClassifier, narArtifact.isOptional(), narArtifact.getFile());
+					} catch (InvalidVersionSpecificationException e) {
+						int severity = IStatus.ERROR;
+						Status status = new Status(severity, pluginId, e.getMessage(), e);
+						throw new CoreException(status);
+					}
+					attachedNarArtifacts.add(attachedNarArtifact);
+				}
+			}
+		}
+		
+		return attachedNarArtifacts;
 	}
 	
 	public String getFirstLibraryType() throws CoreException {
