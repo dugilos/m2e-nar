@@ -257,7 +257,7 @@ public class NarProjectConfigurator extends AbstractProjectConfigurator {
 			mavenConfDesc.setName(MAVEN_CONFIGURATION_NAME);
 
 			// tweak the configuration for maven
-			tweakConfigurationForMaven(mavenConfDesc, narPluginConfiguration);
+			tweakConfigurationForMaven(mavenConfDesc, narPluginConfiguration, os);
 		}
 		prjDesc.setActiveConfiguration(mavenConfDesc);
 		
@@ -415,7 +415,7 @@ public class NarProjectConfigurator extends AbstractProjectConfigurator {
 	}
 
 	@SuppressWarnings("restriction")
-	private void tweakConfigurationForMaven(ICConfigurationDescription configDecription, NarPluginConfiguration narPluginConfiguration) throws CoreException {
+	private void tweakConfigurationForMaven(ICConfigurationDescription configDecription, NarPluginConfiguration narPluginConfiguration, String os) throws CoreException {
 		
 		IConfiguration configuration = ManagedBuildManager.getConfigurationForDescription(configDecription);
 
@@ -446,7 +446,12 @@ public class NarProjectConfigurator extends AbstractProjectConfigurator {
 		configuration.getEditableBuilder().setUseDefaultBuildCmd(false);
 		
 		// Set the Build command
-		configuration.getEditableBuilder().setCommand("mvn");
+		if(OS.WINDOWS.equals(os)) {
+			// for Windows we must add the extension .bat otherwise we get the error : Cannot run program "mvn": Launching failed
+			configuration.getEditableBuilder().setCommand("mvn.bat");
+		} else {
+			configuration.getEditableBuilder().setCommand("mvn");
+		}
 		configuration.getEditableBuilder().setArguments("");
 		
 		// --- "Makefile generation" panel ---
@@ -467,8 +472,10 @@ public class NarProjectConfigurator extends AbstractProjectConfigurator {
 		configuration.getEditableBuilder().setBuildAttribute(IMakeBuilderInfo.BUILD_TARGET_INCREMENTAL, "compile");
 		
 		// Clean
+		// we add generate-sources after the clean command in order to unpack the dependencies in the target folder,
+		// this way eclipse won't complain about missing include files
 		configuration.getEditableBuilder().setCleanBuildEnable(true);
-		configuration.getEditableBuilder().setBuildAttribute(IMakeBuilderInfo.BUILD_TARGET_CLEAN, "clean");
+		configuration.getEditableBuilder().setBuildAttribute(IMakeBuilderInfo.BUILD_TARGET_CLEAN, "clean generate-sources");
 		
 		// ====== "C/C++ Build / Build Variables" screen ======
 		// Place here new build variables
@@ -782,14 +789,27 @@ public class NarProjectConfigurator extends AbstractProjectConfigurator {
 
 	private void addCSourceEntry(List<ICSourceEntry> listSourceEntry, ICSourceEntry entry) {
 		boolean add = true;
+		ICSourceEntry toRemove = null;
 		for(ICSourceEntry sourceEntry : listSourceEntry) {
 			if(sourceEntry.equalsByContents(entry)) {
 				add = false;
 				break;
 			}
+			// if the new entry is a subfolder of an existing entry, there is no need to keep it
+			if(sourceEntry.getFullPath().isPrefixOf(entry.getFullPath())) {
+				add = false;
+				break;
+			}
+			// if an existing entry is a subfolder of the new entry, we replace the existing entry by the new one
+			if(entry.getFullPath().isPrefixOf(sourceEntry.getFullPath())) {
+				toRemove = sourceEntry;
+			}
 		}
 		if(add) {
 			listSourceEntry.add(entry);
+			if(toRemove != null) {
+				listSourceEntry.remove(toRemove);
+			}
 		}
 	}
 
