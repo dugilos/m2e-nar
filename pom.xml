@@ -34,9 +34,9 @@
 		<!-- <m2e-releases-repo.url>http://download.eclipse.org/technology/m2e/releases</m2e-releases-repo.url> -->
 		
 		<!-- plugin deploy configuration -->
-		<!-- <deployServerId></deployServerId> -->
-		<!-- <repositoryUrl></repositoryUrl> -->
-		<!-- <repositoryPath></repositoryPath> -->
+		<deployServerId>aphrael-ftp</deployServerId>
+		<repositoryUrl>ftp://aphrael.dugilos.org</repositoryUrl>
+		<repositoryPath>/var/www/p2/m2e-nar</repositoryPath>
 		
 	</properties>
 
@@ -69,8 +69,16 @@
 		<!-- <module>org.dugilos.m2e.nar.tests</module> -->
 	</modules>
 	
-	
 	<build>
+	<extensions>
+			<!-- Enabling the use of FTP -->
+			<extension>
+				<groupId>org.apache.maven.wagon</groupId>
+				<artifactId>wagon-ftp</artifactId>
+				<version>1.0-beta-6</version>
+			</extension>
+		</extensions>
+
 		<plugins>
 			<plugin>
 				<groupId>org.eclipse.tycho</groupId>
@@ -351,6 +359,28 @@
 						</executions>
 					</plugin>
 					-->
+					<!-- Deploy the update site to the server -->
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>wagon-maven-plugin</artifactId>
+						<version>1.0-beta-4</version>
+						<executions>
+							<execution>
+								<id>upload-repo</id>
+								<phase>deploy</phase>
+								<goals>
+									<goal>upload</goal>
+								</goals>
+								<configuration>
+									<fromDir>${project.build.directory}/site</fromDir>
+									<includes>**</includes>
+									<toDir>${repositoryPath}</toDir>
+									<url>${repositoryUrl}</url>
+									<serverId>${deployServerId}</serverId>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
 				</plugins>
 			</build>
 		</profile>
