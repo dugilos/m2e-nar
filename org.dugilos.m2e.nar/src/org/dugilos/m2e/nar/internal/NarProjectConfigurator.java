@@ -30,7 +30,6 @@ import org.eclipse.cdt.core.settings.model.ICProjectDescription;
 import org.eclipse.cdt.core.settings.model.ICSettingEntry;
 import org.eclipse.cdt.core.settings.model.ICSourceEntry;
 import org.eclipse.cdt.core.settings.model.extension.CConfigurationData;
-import org.eclipse.cdt.make.core.IMakeBuilderInfo;
 import org.eclipse.cdt.managedbuilder.core.BuildException;
 import org.eclipse.cdt.managedbuilder.core.IBuilder;
 import org.eclipse.cdt.managedbuilder.core.IConfiguration;
@@ -38,6 +37,7 @@ import org.eclipse.cdt.managedbuilder.core.IManagedProject;
 import org.eclipse.cdt.managedbuilder.core.IProjectType;
 import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
 import org.eclipse.cdt.managedbuilder.internal.core.Configuration;
+import org.eclipse.cdt.newmake.core.IMakeBuilderInfo;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.runtime.CoreException;
@@ -69,7 +69,7 @@ public class NarProjectConfigurator extends AbstractProjectConfigurator {
 	private static final String CDT_GPP_LANGUAGE_ID = "org.eclipse.cdt.core.g++";
 	private static final String CDT_GCC_LANGUAGE_ID = "org.eclipse.cdt.core.gcc";
 	
-	private static final String MAVEN_CONFIGURATION_NAME = "maven configuration";
+	private static final String MAVEN_CONFIGURATION_NAME = "maven";
 	
 	@Override
 	public AbstractBuildParticipant getBuildParticipant(IMavenProjectFacade projectFacade, MojoExecution execution,
@@ -86,7 +86,9 @@ public class NarProjectConfigurator extends AbstractProjectConfigurator {
 		MavenProject mavenProject = request.getMavenProject();
 		NarPluginConfiguration narPluginConfiguration = new NarPluginConfiguration(project, mavenProject, PLUGIN_ID, log);
 		
+		// Check if the CDT configuration for maven exists and create it if it doesn't exist
 		checkAndCreateCdtProject(project, narPluginConfiguration, monitor);
+		// Update the CDT configuration from the maven configuration
 		setProjectSpecificConfiguration(project, mavenProject, narPluginConfiguration, monitor, log);
 	}
 
@@ -114,6 +116,9 @@ public class NarProjectConfigurator extends AbstractProjectConfigurator {
 			}
 		}
 		if(mavenConfDesc != null) {
+			// Set the configuration as the active one in case it was not
+			prjDesc.setActiveConfiguration(mavenConfDesc);
+			// Update the CDT configuration from the maven configuration
 			setProjectSpecificConfiguration(project, mavenProject, narPluginConfiguration, monitor, log);
 		}
 	}
@@ -247,7 +252,7 @@ public class NarProjectConfigurator extends AbstractProjectConfigurator {
 			}
 			
 			// create the real configuration
-			String id = ManagedBuildManager.calculateChildId(cdtConfiguration.getId(), null);
+			String id = ManagedBuildManager.calculateChildId(cdtConfiguration.getId(), MAVEN_CONFIGURATION_NAME);
 			IConfiguration configuration = managedProject.createConfiguration(cdtConfiguration, id);
 			CConfigurationData configurationData = configuration.getConfigurationData();
 			ICConfigurationDescription configurationDesc = prjDesc.createConfiguration(ManagedBuildManager.CFG_DATA_PROVIDER_ID, configurationData);
@@ -255,11 +260,12 @@ public class NarProjectConfigurator extends AbstractProjectConfigurator {
 
 			// Set the configuration name
 			mavenConfDesc.setName(MAVEN_CONFIGURATION_NAME);
-
-			// tweak the configuration for maven
-			tweakConfigurationForMaven(mavenConfDesc, narPluginConfiguration, os);
 		}
+		// set the configuration as the active one
 		prjDesc.setActiveConfiguration(mavenConfDesc);
+		
+		// tweak the configuration for maven
+		tweakConfigurationForMaven(mavenConfDesc, narPluginConfiguration);
 		
 		// Save the CDT project description
 		cdtCoreModel.setProjectDescription(project, prjDesc);
@@ -415,25 +421,34 @@ public class NarProjectConfigurator extends AbstractProjectConfigurator {
 	}
 
 	@SuppressWarnings("restriction")
-	private void tweakConfigurationForMaven(ICConfigurationDescription configDecription, NarPluginConfiguration narPluginConfiguration, String os) throws CoreException {
+	private void tweakConfigurationForMaven(ICConfigurationDescription configDecription, NarPluginConfiguration narPluginConfiguration) throws CoreException {
 		
+		String os = NarUtil.getOS(null);
 		IConfiguration configuration = ManagedBuildManager.getConfigurationForDescription(configDecription);
 
 		// ====== "C/C++ Build / Tool Chain Editor" screen ======
 		// Set Current toolchain (default from configuration selection should be fine)
 		
 		// Set Current builder "Gnu Make Builder"
-		IBuilder gnuMakeBuilder = null;
-		IBuilder[] builders = ManagedBuildManager.getRealBuilders();
-		for(IBuilder builder : builders) {
-			if(builder.getId().equals("cdt.managedbuild.builder.gnu.cross")) {
-				gnuMakeBuilder = builder;
-				break;
-			}
+		String gnuMakeBuilderId = "cdt.managedbuild.builder.gnu.cross";
+		String mavenBuilderId = ManagedBuildManager.calculateChildId(gnuMakeBuilderId, MAVEN_CONFIGURATION_NAME);
+		
+		IBuilder mavenBuilder = configuration.getEditableBuilder();
+		if(mavenBuilder != null && !mavenBuilderId.equals(mavenBuilder.getId())) {
+			mavenBuilder = null;
 		}
-		if(gnuMakeBuilder != null) {
-			String id = ManagedBuildManager.calculateChildId(gnuMakeBuilder.getId(), null);
-			((Configuration)configuration).changeBuilder(gnuMakeBuilder, id, gnuMakeBuilder.getName(), true);
+		if(mavenBuilder == null) {
+			IBuilder gnuMakeBuilder = null;
+			IBuilder[] builders = ManagedBuildManager.getRealBuilders();
+			for(IBuilder builder : builders) {
+				if(builder.getId().equals(gnuMakeBuilderId)) {
+					gnuMakeBuilder = builder;
+					break;
+				}
+			}
+			if(gnuMakeBuilder != null) {
+				((Configuration)configuration).changeBuilder(gnuMakeBuilder, mavenBuilderId, gnuMakeBuilder.getName(), true);
+			}
 		}
 
 		// ====== "C/C++ Build" screen ======
@@ -448,19 +463,26 @@ public class NarProjectConfigurator extends AbstractProjectConfigurator {
 		// Set the Build command
 		if(OS.WINDOWS.equals(os)) {
 			// for Windows we must add the extension .bat otherwise we get the error : Cannot run program "mvn": Launching failed
-			configuration.getEditableBuilder().setCommand("mvn.bat");
+			configuration.getEditableBuilder().setBuildAttribute(IMakeBuilderInfo.BUILD_COMMAND, "mvn.bat");
 		} else {
-			configuration.getEditableBuilder().setCommand("mvn");
+			configuration.getEditableBuilder().setBuildAttribute(IMakeBuilderInfo.BUILD_COMMAND, "mvn");
 		}
-		configuration.getEditableBuilder().setArguments("");
+		configuration.getEditableBuilder().setBuildAttribute(IMakeBuilderInfo.BUILD_ARGUMENTS, "");
 		
 		// --- "Makefile generation" panel ---
 		// Disable the Makefile generation
 		configuration.getEditableBuilder().setManagedBuildOn(false);
 		
+		// --- "Build location" panel ---
+		// Set the Build directory
+		//String buildPath = configuration.getEditableBuilder().getBuildPath(); // ${workspace_loc:/<project-name>}/
+		//configuration.getEditableBuilder().setBuildPath(buildPath);
+		
 		// === "Behavior" tab ===
 		// --- "Build settings" panel ---
 		// Stop on first build error
+		
+		// Enable parallel build
 		
 		// --- "Workbench Build Behavior" panel ---
 		// Build on resource save (Auto build)
@@ -469,7 +491,7 @@ public class NarProjectConfigurator extends AbstractProjectConfigurator {
 		
 		// Build (Incremental build)
 		configuration.getEditableBuilder().setIncrementalBuildEnable(true);
-		configuration.getEditableBuilder().setBuildAttribute(IMakeBuilderInfo.BUILD_TARGET_INCREMENTAL, "compile");
+		configuration.getEditableBuilder().setBuildAttribute(IMakeBuilderInfo.BUILD_TARGET_INCREMENTAL, "install");
 		
 		// Clean
 		// we add generate-sources after the clean command in order to unpack the dependencies in the target folder,
