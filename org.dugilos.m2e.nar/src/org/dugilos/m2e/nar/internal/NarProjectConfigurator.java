@@ -155,88 +155,90 @@ public class NarProjectConfigurator extends AbstractProjectConfigurator {
 		// Create (or get if it exists) the CDT project description
 		ICProjectDescription prjDesc = cdtCoreModel.createProjectDescription(project, true, true);
 		
+		// we must create or check the maven configuration, configurations are derived from model configurations from CDT.
+		// The model configurations are defined by :
+		// * The toolchain (depending on the system) :
+		//  - gnu (linux)
+		//  - gnu.cross (??)
+		//  - gnu.cygwin (Windows)
+		//  - gnu.mingw (Windows)
+		//  - gnu.solaris (Solaris)
+		//  - macosx (Mac OS X)
+		//  - msvc (Windows)
+		// * The delivery type
+		//  - executable
+		//  - shared library
+		//  - static library
+		// * A "release" or a "debug" mode
+		
+		// * OS (get from NarUtil.getOS(String))
+		//  - Windows
+		//  - Linux
+		//  - MacOSX
+		//  - SunOS
+		//  - FreeBSD
+		String os = NarUtil.getOS(null);
+		
+		// * Linker name from the maven nar plugin configuration
+		//  - msvc (for Windows)
+		//  - icl (for Windows)
+		//  - g++ (for Windows)
+		//  - gcc (for Windows)
+		// ------------------------
+		//  - g++ (for Linux)
+		//  - gcc (for linux)
+		//  - icpc (for Linux)
+		//  - icc (for Linux)
+		// ------------------------
+		//  - g++ (for Mac OS X)
+		//  - gcc (for Mac OS X)
+		//  - icpc (for Mac OS X)
+		//  - icc (for Mac OS X)
+		// ------------------------
+		//  - CC (for Solaris / SunOS)
+		//  - g++ (for Solaris / SunOS)
+		//  - gcc (for Solaris / SunOS)
+		// ------------------------
+		//  - g++ (for FreeBSD)
+		//  - gcc (for FreeBSD)
+		// ------------------------
+		//  - g++ (for AIX)
+		//  - gcc (for AIX)
+		//  - xlC (for AIX)
+		String linkerName = narPluginConfiguration.getLinker().getName();
+		
+		// * Library type from the maven nar plugin configuration
+		//  - executable
+		//  - shared
+		//  - static
+		//  - jni
+		//  - plugin
+		String libraryType = narPluginConfiguration.getFirstLibraryType();
+		
+		// * Debug mode from the maven nar plugin configuration
+		//  - true
+		//  - false
+		boolean debug = narPluginConfiguration.isDebug();
+
+		// Choose the project type from maven nar configuration
+		IProjectType cdtProjectType = chooseProjectType(os, linkerName, libraryType);
+		
+		// Choose the configuration to use :
+		IConfiguration cdtConfiguration = chooseConfiguration(cdtProjectType, os, linkerName, debug);
+		
+		// Create teh id for the maven configuration
+		String mavenConfId = ManagedBuildManager.calculateChildId(cdtConfiguration.getId(), MAVEN_CONFIGURATION_NAME);
+		
 		// get the "maven" configuration description if it exists, or create it
 		ICConfigurationDescription mavenConfDesc = null;
 		ICConfigurationDescription configDecriptions[] = prjDesc.getConfigurations();
 		for (ICConfigurationDescription configDescription : configDecriptions) {
-			if(MAVEN_CONFIGURATION_NAME.equals(configDescription.getName())) {
+			if(mavenConfId.equals(configDescription.getId())) {
 				mavenConfDesc = configDescription;
 				break;
 			}
 		}
 		if(mavenConfDesc == null) {
-			// we must create the maven configuration, this is done by "implementing" a model configuration from CDT.
-			// The model configurations are defined by :
-			// * The toolchain (depending on the system) :
-			//  - gnu (linux)
-			//  - gnu.cross (??)
-			//  - gnu.cygwin (Windows)
-			//  - gnu.mingw (Windows)
-			//  - gnu.solaris (Solaris)
-			//  - macosx (Mac OS X)
-			//  - msvc (Windows)
-			// * The delivery type
-			//  - executable
-			//  - shared library
-			//  - static library
-			// * A "release" or a "debug" mode
-			
-			// We get those informations from the system and the project configuration :
-			// * The OS (get from NarUtil.getOS(String))
-			//  - Windows
-			//  - Linux
-			//  - MacOSX
-			//  - SunOS
-			//  - FreeBSD
-			String os = NarUtil.getOS(null);
-			
-			// * The linker name from the maven nar plugin configuration
-			//  - msvc (for Windows)
-			//  - icl (for Windows)
-			//  - g++ (for Windows)
-			//  - gcc (for Windows)
-			// ------------------------
-			//  - g++ (for Linux)
-			//  - gcc (for linux)
-			//  - icpc (for Linux)
-			//  - icc (for Linux)
-			// ------------------------
-			//  - g++ (for Mac OS X)
-			//  - gcc (for Mac OS X)
-			//  - icpc (for Mac OS X)
-			//  - icc (for Mac OS X)
-			// ------------------------
-			//  - CC (for Solaris / SunOS)
-			//  - g++ (for Solaris / SunOS)
-			//  - gcc (for Solaris / SunOS)
-			// ------------------------
-			//  - g++ (for FreeBSD)
-			//  - gcc (for FreeBSD)
-			// ------------------------
-			//  - g++ (for AIX)
-			//  - gcc (for AIX)
-			//  - xlC (for AIX)
-			String linkerName = narPluginConfiguration.getLinker().getName();
-			
-			// * The library type from the maven nar plugin configuration
-			//  - executable
-			//  - shared
-			//  - static
-			//  - jni
-			//  - plugin
-			String libraryType = narPluginConfiguration.getFirstLibraryType();
-			
-			// * The debug mode from the maven nar plugin configuration
-			//  - true
-			//  - false
-			boolean debug = narPluginConfiguration.isDebug();
-			
-			// Choose the project type from maven nar configuration
-			IProjectType cdtProjectType = chooseProjectType(os, linkerName, libraryType);
-			
-			// Choose the configuration to use :
-			IConfiguration cdtConfiguration = chooseConfiguration(cdtProjectType, os, linkerName, debug);
-			
 			// Create the build info (mandatory to createManagedProject)
 			ManagedBuildManager.createBuildInfo(project);
 			
@@ -252,8 +254,7 @@ public class NarProjectConfigurator extends AbstractProjectConfigurator {
 			}
 			
 			// create the real configuration
-			String id = ManagedBuildManager.calculateChildId(cdtConfiguration.getId(), MAVEN_CONFIGURATION_NAME);
-			IConfiguration configuration = managedProject.createConfiguration(cdtConfiguration, id);
+			IConfiguration configuration = managedProject.createConfiguration(cdtConfiguration, mavenConfId);
 			CConfigurationData configurationData = configuration.getConfigurationData();
 			ICConfigurationDescription configurationDesc = prjDesc.createConfiguration(ManagedBuildManager.CFG_DATA_PROVIDER_ID, configurationData);
 			mavenConfDesc = configurationDesc;
@@ -265,7 +266,7 @@ public class NarProjectConfigurator extends AbstractProjectConfigurator {
 		prjDesc.setActiveConfiguration(mavenConfDesc);
 		
 		// tweak the configuration for maven
-		tweakConfigurationForMaven(mavenConfDesc, narPluginConfiguration);
+		tweakConfigurationForMaven(os, libraryType, debug, mavenConfDesc, narPluginConfiguration);
 		
 		// Save the CDT project description
 		cdtCoreModel.setProjectDescription(project, prjDesc);
@@ -318,37 +319,37 @@ public class NarProjectConfigurator extends AbstractProjectConfigurator {
 			//  - g++ (for Windows)
 			//  - gcc (for Windows)
 			if("msvc".equals(linkerName)) {
-				prefix = "org.eclipse.cdt.msvc.projectType.";
+				prefix = "org.eclipse.cdt.msvc.projectType";
 			} else {
 				//TODO choose between mingw and cygwin
-				prefix = "cdt.managedbuild.target.gnu.mingw.";
+				prefix = "cdt.managedbuild.target.gnu.mingw";
 			}
 		} else if(OS.LINUX.equals(os)) {
 			//  - g++ (for Linux)
 			//  - gcc (for linux)
 			//  - icpc (for Linux)
 			//  - icc (for Linux)
-			prefix = "cdt.managedbuild.target.gnu.";
+			prefix = "cdt.managedbuild.target.gnu";
 		} else if(OS.MACOSX.equals(os)) {
 			//  - g++ (for Mac OS X)
 			//  - gcc (for Mac OS X)
 			//  - icpc (for Mac OS X)
 			//  - icc (for Mac OS X)
-			prefix = "cdt.managedbuild.target.macosx.";
+			prefix = "cdt.managedbuild.target.macosx";
 		} else if(OS.SUNOS.equals(os)) {
 			//  - CC (for Solaris / SunOS)
 			//  - g++ (for Solaris / SunOS)
 			//  - gcc (for Solaris / SunOS)
-			prefix = "cdt.managedbuild.target.gnu.solaris.";
+			prefix = "cdt.managedbuild.target.gnu.solaris";
 		} else if(OS.FREEBSD.equals(os)) {
 			//  - g++ (for FreeBSD)
 			//  - gcc (for FreeBSD)
-			prefix = "cdt.managedbuild.target.gnu.";
+			prefix = "cdt.managedbuild.target.gnu";
 		} else if("AIX".equals(os)) {
 			//  - g++ (for AIX)
 			//  - gcc (for AIX)
 			//  - xlC (for AIX)
-			prefix = "cdt.managedbuild.target.gnu.";
+			prefix = "cdt.managedbuild.target.gnu";
 		} else {
 			int severity = IStatus.ERROR;
 			String pluginId = PLUGIN_ID;
@@ -358,15 +359,15 @@ public class NarProjectConfigurator extends AbstractProjectConfigurator {
 		
 		String suffix = null;
 		if("executable".equals(libraryType)) {
-			suffix = "exe";
+			suffix = ".exe";
 		} else if("shared".equals(libraryType) || "jni".equals(libraryType)) {
 			if(OS.WINDOWS.equals(os) && "msvc".equals(linkerName)) {
-				suffix = "dll";
+				suffix = ".dll";
 			} else {
-				suffix = "so";
+				suffix = ".so";
 			}
 		} else if("static".equals(libraryType)) {
-			suffix = "lib";
+			suffix = ".lib";
 		} else if("plugin".equals(libraryType)) {
 			int severity = IStatus.ERROR;
 			String pluginId = PLUGIN_ID;
@@ -421,16 +422,17 @@ public class NarProjectConfigurator extends AbstractProjectConfigurator {
 	}
 
 	@SuppressWarnings("restriction")
-	private void tweakConfigurationForMaven(ICConfigurationDescription configDecription, NarPluginConfiguration narPluginConfiguration) throws CoreException {
+	private void tweakConfigurationForMaven(String os, String libraryType, boolean debug, ICConfigurationDescription configDecription, NarPluginConfiguration narPluginConfiguration) throws CoreException {
 		
-		String os = NarUtil.getOS(null);
 		IConfiguration configuration = ManagedBuildManager.getConfigurationForDescription(configDecription);
 
 		// ====== "C/C++ Build / Tool Chain Editor" screen ======
 		// Set Current toolchain (default from configuration selection should be fine)
 		
 		// Set Current builder "Gnu Make Builder"
-		String gnuMakeBuilderId = "cdt.managedbuild.builder.gnu.cross";
+		// choose the builder
+		IBuilder gnuMakeBuilder = chooseGnuMakeBuilder(os, libraryType, debug);
+		String gnuMakeBuilderId = gnuMakeBuilder.getId();
 		String mavenBuilderId = ManagedBuildManager.calculateChildId(gnuMakeBuilderId, MAVEN_CONFIGURATION_NAME);
 		
 		IBuilder mavenBuilder = configuration.getEditableBuilder();
@@ -438,17 +440,7 @@ public class NarProjectConfigurator extends AbstractProjectConfigurator {
 			mavenBuilder = null;
 		}
 		if(mavenBuilder == null) {
-			IBuilder gnuMakeBuilder = null;
-			IBuilder[] builders = ManagedBuildManager.getRealBuilders();
-			for(IBuilder builder : builders) {
-				if(builder.getId().equals(gnuMakeBuilderId)) {
-					gnuMakeBuilder = builder;
-					break;
-				}
-			}
-			if(gnuMakeBuilder != null) {
-				((Configuration)configuration).changeBuilder(gnuMakeBuilder, mavenBuilderId, gnuMakeBuilder.getName(), true);
-			}
+			((Configuration)configuration).changeBuilder(gnuMakeBuilder, mavenBuilderId, gnuMakeBuilder.getName(), true);
 		}
 
 		// ====== "C/C++ Build" screen ======
@@ -652,6 +644,86 @@ public class NarProjectConfigurator extends AbstractProjectConfigurator {
 		
 	}
 
+	private IBuilder chooseGnuMakeBuilder(String os, String libraryType, boolean debug) throws CoreException {
+		// ------------------------
+		// cdt.managedbuild.target.gnu.builder.exe.debug
+		// cdt.managedbuild.target.gnu.builder.exe.release
+		// cdt.managedbuild.target.gnu.builder.lib.debug
+		// cdt.managedbuild.target.gnu.builder.lib.release
+		// cdt.managedbuild.target.gnu.builder.so.debug
+		// cdt.managedbuild.target.gnu.builder.so.release
+		// ------------------------
+		// cdt.managedbuild.target.gnu.builder.cygwin.exe.debug
+		// cdt.managedbuild.target.gnu.builder.cygwin.exe.release
+		// cdt.managedbuild.target.gnu.builder.cygwin.lib.debug
+		// cdt.managedbuild.target.gnu.builder.cygwin.lib.release
+		// cdt.managedbuild.target.gnu.builder.cygwin.so.debug
+		// cdt.managedbuild.target.gnu.builder.cygwin.so.release
+		// ------------------------
+		// cdt.managedbuild.target.gnu.builder.macosx.exe.debug
+		// cdt.managedbuild.target.gnu.builder.macosx.exe.release
+		// cdt.managedbuild.target.gnu.builder.macosx.lib.debug
+		// cdt.managedbuild.target.gnu.builder.macosx.lib.release
+		// cdt.managedbuild.target.gnu.builder.macosx.so.debug
+		// cdt.managedbuild.target.gnu.builder.macosx.so.release
+		// ------------------------
+		
+		String id = null;
+		if(OS.WINDOWS.equals(os)) {
+			//TODO choose between mingw and cygwin
+			id = "cdt.managedbuild.target.gnu.builder";
+		} else if(OS.LINUX.equals(os)) {
+			id = "cdt.managedbuild.target.gnu.builder";
+		} else if(OS.MACOSX.equals(os)) {
+			id = "cdt.managedbuild.target.gnu.builder.macosx";
+		} else if(OS.SUNOS.equals(os)) {
+			id = "cdt.managedbuild.target.gnu.builder";
+		} else if(OS.FREEBSD.equals(os)) {
+			id = "cdt.managedbuild.target.gnu.builder";
+		} else if("AIX".equals(os)) {
+			id = "cdt.managedbuild.target.gnu.builder";
+		} else {
+			int severity = IStatus.ERROR;
+			String pluginId = PLUGIN_ID;
+			Status status = new Status(severity, pluginId, "Unknown OS " + os + ", unable to choose base configuration");
+			throw new CoreException(status);
+		}
+		
+		if("executable".equals(libraryType)) {
+			id += ".exe";
+		} else if("shared".equals(libraryType) || "jni".equals(libraryType)) {
+			id += ".so";
+		} else if("static".equals(libraryType)) {
+			id += ".lib";
+		} else if("plugin".equals(libraryType)) {
+			int severity = IStatus.ERROR;
+			String pluginId = PLUGIN_ID;
+			Status status = new Status(severity, pluginId, "Library type " + libraryType + " incompatible with CDT");
+			throw new CoreException(status);
+		} else {
+			int severity = IStatus.ERROR;
+			String pluginId = PLUGIN_ID;
+			Status status = new Status(severity, pluginId, "Unknwon library type " + libraryType);
+			throw new CoreException(status);
+		}
+		
+		if(debug) {
+			id += ".debug";
+		} else {
+			id += ".release";
+		}
+		
+		IBuilder builder = ManagedBuildManager.getExtensionBuilder(id);
+		if(builder == null) {
+			int severity = IStatus.ERROR;
+			String pluginId = PLUGIN_ID;
+			Status status = new Status(severity, pluginId, "Unknwon builder " + id);
+			throw new CoreException(status);
+		}
+		
+		return builder;
+	}
+	
 	private void setLanguageProviders(ICConfigurationDescription configDecription, IConfiguration configuration) throws CoreException {
 		
 		boolean gcc = false;
