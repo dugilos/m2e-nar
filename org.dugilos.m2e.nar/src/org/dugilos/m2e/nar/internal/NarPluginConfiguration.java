@@ -49,6 +49,7 @@ import com.github.maven_nar.Library;
 import com.github.maven_nar.Linker;
 import com.github.maven_nar.NarArtifact;
 import com.github.maven_nar.NarConstants;
+import com.github.maven_nar.NarInfo;
 import com.github.maven_nar.NarLayout;
 import com.github.maven_nar.NarManager;
 import com.github.maven_nar.NarProperties;
@@ -69,7 +70,7 @@ public class NarPluginConfiguration {
 	private static final String DEFAULT_RELATIVE_TEST_SOURCE_DIRECTORY = "src/test";
 	private static final String DEFAULT_RELATIVE_INCLUDE_DIRECTORY = "include";
 	
-	//private MavenProject mavenProject = null;
+	private MavenProject mavenProject = null;
 	private String pluginId = null;
 	
 	private File absoluteProjectBaseDir = null;
@@ -85,7 +86,7 @@ public class NarPluginConfiguration {
 	
 	public NarPluginConfiguration(IProject project, MavenProject mavenProject, String pluginId, Log log) throws CoreException {
 
-		//this.mavenProject = mavenProject;
+		this.mavenProject = mavenProject;
 		this.pluginId = pluginId;
 
 		// extract local repository (containing nar files dependencies)
@@ -334,21 +335,28 @@ public class NarPluginConfiguration {
 		return getDependenciesProperties(scopes, TEST_DEPENDENCIES_UNPACK_DIRECTORY, log);
 	}
 	
-	@SuppressWarnings("unchecked")
 	private List<NarDependencyProperties> getDependenciesProperties(List<String> scopes, String unpackFolder, Log log) throws CoreException {
 		
-		// get dependencies unpack directory
-		File unpackDirectory = new File(projectBuildDirectory, unpackFolder);
-		
 		// get nar dependencies (this includes the dependencies from dependencies)
-		List<NarArtifact> narArtifacts = null;
+		List<NarArtifact> narArtifacts = new ArrayList<NarArtifact>();
 		try {
-			narArtifacts = narManager.getNarDependencies(scopes);
+			Set<Artifact> artifacts = mavenProject.getArtifacts();
+			for(Artifact artifact : artifacts) {
+				if(scopes.contains(artifact.getScope())) {
+					NarInfo narInfo = narManager.getNarInfo(artifact);
+					if (narInfo != null) {
+						narArtifacts.add(new NarArtifact(artifact, narInfo));
+					}
+				}
+			}
 		} catch (MojoExecutionException e) {
 			int severity = IStatus.ERROR;
 			Status status = new Status(severity, pluginId, e.getMessage(), e);
 			throw new CoreException(status);
 		}
+		
+		// get dependencies unpack directory
+		File unpackDirectory = new File(projectBuildDirectory, unpackFolder);
 		
 		// get nar dependencies paths
 		List<NarDependencyProperties> narDependenciesProperties = getNarDependenciesProperties(narArtifacts, unpackDirectory, log);
