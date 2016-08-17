@@ -471,12 +471,7 @@ public class NarProjectConfigurator extends AbstractProjectConfigurator {
 		configuration.getEditableBuilder().setUseDefaultBuildCmd(false);
 		
 		// Set the Build command
-		if(OS.WINDOWS.equals(os)) {
-			// for Windows we must add the extension .bat otherwise we get the error : Cannot run program "mvn": Launching failed
-			configuration.getEditableBuilder().setBuildAttribute(IMakeBuilderInfo.BUILD_COMMAND, "mvn.bat");
-		} else {
-			configuration.getEditableBuilder().setBuildAttribute(IMakeBuilderInfo.BUILD_COMMAND, "mvn");
-		}
+		configuration.getEditableBuilder().setBuildAttribute(IMakeBuilderInfo.BUILD_COMMAND, SystemConfigurator.getMvnCommand(os));
 		configuration.getEditableBuilder().setBuildAttribute(IMakeBuilderInfo.BUILD_ARGUMENTS, "");
 		
 		// --- "Makefile generation" panel ---
