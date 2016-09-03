@@ -4,13 +4,21 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<groupId>org.dugilos.m2e</groupId>
-		<artifactId>org.dugilos.m2e.nar.parent</artifactId>
-		<version>0.0.1-SNAPSHOT</version>
+		<groupId>org.dugilos.m2e-nar</groupId>
+		<artifactId>plugin-parent</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
 	</parent>
 
-
+	<!-- The Maven artifactId must be the same as the bundle symbolic name (the plugin ID) -->
 	<artifactId>org.dugilos.m2e.nar</artifactId>
 	<packaging>eclipse-plugin</packaging>
 
+	<dependencies>
+		<dependency>
+			<groupId>org.dugilos.m2e</groupId>
+			<artifactId>bundle-nar-maven-plugin</artifactId>
+			<version>3.5.0</version>
+		</dependency>
+	</dependencies>
+	
 </project>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <bundle id="org.dugilos.m2e.nar" version="1.0.0.qualifier">
+      <category name="plugins"/>
+   </bundle>
+   <bundle id="org.dugilos.m2e.bundle-nar-maven-plugin" version="3.5.0">
+      <category name="bundles"/>
+   </bundle>
+   <category-def name="plugins" label="Plugins"/>
+   <category-def name="bundles" label="Bundles"/>
+</site>

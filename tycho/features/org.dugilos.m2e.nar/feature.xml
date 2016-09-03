@@ -2,7 +2,7 @@
 <feature
       id="org.dugilos.m2e.nar.feature"
       label="%featureName"
-      version="0.0.1.qualifier"
+      version="1.0.0.qualifier"
       provider-name="%providerName"
       plugin="org.dugilos.m2e.nar">
 
@@ -29,14 +29,14 @@
    </requires>
 
    <plugin
-         id="org.dugilos.m2e.nar"
+         id="org.dugilos.m2e.bundle-nar-maven-plugin"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="org.dugilos.m2e.bundle-nar-maven-plugin"
+         id="org.dugilos.m2e.nar"
          download-size="0"
          install-size="0"
          version="0.0.0"

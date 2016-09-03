@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	
+	<parent>
+		<groupId>org.dugilos.m2e-nar</groupId>
+		<artifactId>tycho-parent</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+	</parent>
+	
+	<artifactId>site-parent</artifactId>
+	<packaging>pom</packaging>
+	
+	<properties>
+		<!-- plugin deploy configuration -->
+		<deployServerId>aphrael-ftp</deployServerId>
+		<repositoryUrl>ftp://aphrael.dugilos.org</repositoryUrl>
+		<repositoryPath>/var/www/html/m2e-nar</repositoryPath>
+	</properties>
+	
+	<profiles>
+		<!--
+		Site build profile will only be activated in the presence of a site.xml file in
+		the base directory of the project.
+		-->
+		<profile>
+			<id>site-build</id>
+			<activation>
+				<file>
+					<exists>site.xml</exists>
+				</file>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.eclipse.tycho</groupId>
+						<artifactId>tycho-packaging-plugin</artifactId>
+						<version>${tychoVersion}</version>
+						<executions>
+							<execution>
+								<id>build-qualifier</id>
+								<goals>
+									<goal>build-qualifier</goal>
+								</goals>
+								<phase>validate</phase>
+							</execution>
+						</executions>
+						<configuration>
+							<metadataRepositoryName>${p2MetadataName}</metadataRepositoryName>
+							<artifactRepositoryName>${p2MetadataName}</artifactRepositoryName>
+						</configuration>
+					</plugin>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>wagon-maven-plugin</artifactId>
+						<version>1.0-beta-4</version>
+						<executions>
+							<execution>
+								<id>upload-repo</id>
+								<phase>deploy</phase>
+								<goals>
+									<goal>upload</goal>
+								</goals>
+								<configuration>
+									<fromDir>${project.build.directory}/site</fromDir>
+									<includes>**</includes>
+									<toDir>${repositoryPath}</toDir>
+									<url>${repositoryUrl}</url>
+									<serverId>${deployServerId}</serverId>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+	
+	<modules>
+	</modules>
+	
+</project>
+	

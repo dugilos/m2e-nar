@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	
+	<groupId>org.dugilos.m2e-nar</groupId>
+	<artifactId>tycho-parent</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+	<packaging>pom</packaging>
+	
+	<properties>
+		<!-- tycho -->
+		<tychoVersion>0.22.0</tychoVersion>
+		
+		<!-- tycho-support configuration -->
+		<p2MetadataName>M2E Nar Connector</p2MetadataName>
+		
+		<!-- repositories url -->
+		<eclipse.target>luna</eclipse.target>
+		<eclipse-repo.url>http://download.eclipse.org/releases/${eclipse.target}</eclipse-repo.url>
+		
+		<eclipse-cdt.version>8.6</eclipse-cdt.version>
+		<eclipse-cdt-repo.url>http://download.eclipse.org/tools/cdt/releases/${eclipse-cdt.version}/</eclipse-cdt-repo.url>
+	</properties>
+	
+	<repositories>
+		<repository>
+			<id>eclipse</id>
+			<layout>p2</layout>
+			<url>${eclipse-repo.url}</url>
+		</repository>
+		 
+		<repository>
+			<id>eclipse-cdt</id>
+			<layout>p2</layout>
+			<url>${eclipse-cdt-repo.url}</url>
+		</repository>
+	</repositories>
+	
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-maven-plugin</artifactId>
+				<version>${tychoVersion}</version>
+				<extensions>true</extensions>
+			</plugin>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>target-platform-configuration</artifactId>
+				<version>${tychoVersion}</version>
+				<configuration>
+					<pomDependencies>consider</pomDependencies>
+				</configuration>
+			</plugin>
+		</plugins>
+		<pluginManagement>
+			<plugins>
+				<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+				<plugin>
+					<groupId>org.eclipse.m2e</groupId>
+					<artifactId>lifecycle-mapping</artifactId>
+					<version>1.0.0</version>
+					<configuration>
+						<lifecycleMappingMetadata>
+							<pluginExecutions>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>org.eclipse.tycho</groupId>
+										<artifactId>tycho-compiler-plugin</artifactId>
+										<versionRange>[${tychoVersion},)</versionRange>
+										<goals>
+											<goal>compile</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore></ignore>
+									</action>
+								</pluginExecution>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>org.eclipse.tycho</groupId>
+										<artifactId>tycho-packaging-plugin</artifactId>
+										<versionRange>[${tychoVersion},)</versionRange>
+										<goals>
+											<goal>validate-id</goal>
+											<goal>build-qualifier</goal>
+											<goal>validate-version</goal>
+											<goal>build-qualifier-aggregator</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore></ignore>
+									</action>
+								</pluginExecution>
+							</pluginExecutions>
+						</lifecycleMappingMetadata>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+	
+	<profiles>
+		<!-- 
+		<profile>
+			<id>sign</id>
+			<activation>
+				<property>
+					<name>jarsigner.alias</name>
+				</property>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-jarsigner-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>sign</id>
+								<goals>
+									<goal>sign</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		 -->
+		<profile>
+			<id>deploy</id>
+			<activation>
+				<file>
+					<missing>.maven-deploy</missing>
+				</file>
+			</activation>
+			<build>
+				<pluginManagement>
+					<plugins>
+						<!-- We disable the deploy on Maven repository to keep only the deploy on p2 repository -->
+						<plugin>
+							<groupId>org.apache.maven.plugins</groupId>
+							<artifactId>maven-deploy-plugin</artifactId>
+							<configuration>
+								<skip>true</skip>
+							</configuration>
+						</plugin>
+					</plugins>
+				</pluginManagement>
+			</build>
+		</profile>
+		
+	</profiles>
+	
+	<modules>
+		<module>plugins</module>
+		<module>features</module>
+		<module>sites</module>
+	</modules>
+	
+</project>
