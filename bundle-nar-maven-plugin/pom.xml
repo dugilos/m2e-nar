@@ -5,7 +5,7 @@
 
 	<groupId>org.dugilos.m2e</groupId>
 	<artifactId>bundle-nar-maven-plugin</artifactId>
-	<version>3.5.0-SNAPSHOT</version>
+	<version>3.5.0</version>
 	<packaging>bundle</packaging>
 
 	<name>nar-maven-plugin bundle</name>
@@ -24,20 +24,26 @@
 				<configuration>
 					<manifestLocation>${manifest-location}</manifestLocation>
 					<instructions>
-						<!-- <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName> -->
-						<!-- <Bundle-Version>${project.version}</Bundle-Version> -->
-						<!-- <Bundle-Name>${project.name}</Bundle-Name> -->
+						<Bundle-SymbolicName>${project.groupId}.${project.artifactId}</Bundle-SymbolicName>
+						<Bundle-Version>${project.version}</Bundle-Version> <!-- .qualifier -->
+						<Bundle-Name>${project.name}</Bundle-Name>
 						<Bundle-ClassPath>{maven-dependencies}</Bundle-ClassPath>
 						
-						<Embed-Dependency>nar-maven-plugin;inline=true</Embed-Dependency>
+						<Embed-Dependency>nar-maven-plugin</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>
-						<!-- <Embed-Directory>jars</Embed-Directory> -->
+						<Embed-Directory>jars</Embed-Directory>
 						
-						<!-- <Export-Package>com.github.maven_nar.*</Export-Package> -->
-						<_exportcontents>com.github.maven_nar.*;version="3.5.0"</_exportcontents>
-						
-						<_failok>true</_failok>
-						<_nouses>true</_nouses>
+						<Export-Package>com.github.maven_nar.*</Export-Package>
+						<Import-Package>
+							!com.google.*,
+							!javax.xml.*,
+							!org.apache.*,
+							!org.codehaus.*,
+							!org.sonatype.*,
+							!org.w3c.*,
+							!org.xml.*,
+							*
+						</Import-Package>
 					</instructions>
 				</configuration>
 			</plugin>
@@ -52,6 +58,13 @@
 						<archive>
 							<manifestFile>${manifest-location}/MANIFEST.MF</manifestFile>
 						</archive>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-deploy-plugin</artifactId>
+					<configuration>
+						<skip>true</skip>
 					</configuration>
 				</plugin>
 				<plugin>
@@ -99,7 +112,6 @@
 						</lifecycleMappingMetadata>
 					</configuration>
 				</plugin>
-				
 			</plugins>
 		</pluginManagement>
 

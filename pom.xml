@@ -63,6 +63,15 @@
 		 -->
 	</repositories>
 
+	<dependencies>
+		<dependency>
+			<groupId>org.dugilos.m2e</groupId>
+			<artifactId>bundle-nar-maven-plugin</artifactId>
+			<version>3.5.0</version>
+		</dependency>
+	</dependencies>
+	
+	<!-- the project bundle-nar-maven-plugin must be built and installed before building m2e.nar -->
 	<modules>
 		<module>org.dugilos.m2e.nar</module>
 		<module>org.dugilos.m2e.nar.feature</module>
@@ -108,8 +117,6 @@
 				<artifactId>target-platform-configuration</artifactId>
 				<version>${tychoVersion}</version>
 				<configuration>
-					<resolver>p2</resolver>
-					<ignoreTychoRepositories>true</ignoreTychoRepositories>
 					<pomDependencies>consider</pomDependencies>
 					
 					<!-- 

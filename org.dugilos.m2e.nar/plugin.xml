@@ -13,31 +13,5 @@
    <extension
          point="org.eclipse.m2e.core.lifecycleMappingMetadataSource">
    </extension>
-   <extension
-         point="org.eclipse.m2e.core.lifecycleMappings">
-      <lifecycleMapping
-            class="org.dugilos.m2e.nar.internal.NarLifecycleMapping"
-            id="org.dugilos.m2e.nar.narLifecycleMapping"
-            name="NAR Lyfecycle mapping">
-      </lifecycleMapping>
-   </extension>
-   <!--
-   <extension
-         point="org.eclipse.m2e.core.lifecycleMappings">
-      <lifecycleMapping
-            class="org.dugilos.m2e.nar.internal.NarLifecycleMapping"
-            id="org.dugilos.m2e.nar.narLifecycleMapping"
-            packaging-type="jar">
-         <mojo
-            groupId="com.github.maven-nar"
-            artifactId="nar-maven-plugin"
-            versionRange="[3.2.3,)"
-            goals="nar-validate">
-            <configurator id="org.dugilos.m2e.nar.narConfigurator">
-            </configurator>
-         </mojo>
-      </lifecycleMapping>
-   </extension>
-   -->
    
 </plugin>

@@ -3,5 +3,9 @@
    <feature url="features/org.dugilos.m2e.nar.feature_0.0.1.qualifier.jar" id="org.dugilos.m2e.nar.feature" version="0.0.1.qualifier">
       <category name="m2eclipse-nar"/>
    </feature>
+   <bundle id="org.dugilos.m2e.bundle-nar-maven-plugin" version="3.5.0">
+      <category name="bundles"/>
+   </bundle>
    <category-def name="m2eclipse-nar" label="M2E Nar Connector"/>
+   <category-def name="bundles" label="Bundles"/>
 </site>
