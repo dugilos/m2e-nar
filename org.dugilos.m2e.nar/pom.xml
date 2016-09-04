@@ -44,7 +44,7 @@
 									<destFileName>plexus-archiver.jar</destFileName>
 								</artifactItem>
 							</artifactItems>
-							<outputDirectory>${project.basedir}/library</outputDirectory>
+							<outputDirectory>${project.build.directory}/libraries</outputDirectory>
 							<overWriteReleases>false</overWriteReleases>
 							<overWriteSnapshots>true</overWriteSnapshots>
 						</configuration>
