@@ -29,7 +29,7 @@
 		
 		<site.deployServerId>aphrael-ftp</site.deployServerId>
 		<site.repositoryUrl>ftp://aphrael.dugilos.org</site.repositoryUrl>
-		<site.repositoryPath>/var/www/p2/m2e-nar</site.repositoryPath>
+		<site.repositoryPath>/var/www/html/m2e-nar</site.repositoryPath>
 	</properties>
 
 	<repositories>
