@@ -2,7 +2,7 @@
 <feature
       id="org.dugilos.m2e.nar.feature"
       label="%featureName"
-      version="0.0.1.qualifier"
+      version="1.0.0.qualifier"
       provider-name="%providerName"
       plugin="org.dugilos.m2e.nar">
 
