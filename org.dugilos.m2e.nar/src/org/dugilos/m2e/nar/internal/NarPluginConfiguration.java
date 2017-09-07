@@ -370,8 +370,14 @@ public class NarPluginConfiguration {
 		for (NarArtifact narArtifact : narArtifacts) {
 			
 			String binding = narArtifact.getNarInfo().getBinding(aol, Library.NONE);
-			if (!binding.equals(Library.JNI) && !binding.equals(Library.NONE) && 
-					!binding.equals(Library.EXECUTABLE) && !binding.equals(Library.PLUGIN)) {
+			// valeurs possibles :
+			// - NONE = "none"             : auncun type, exemple uniquement des fichiers d'entête
+			// - STATIC = "static"         : librairie statique
+			// - SHARED = "shared"         : librairie dynamique
+			// - JNI = "jni"               : librairie jni        <= non pris en compte pour les dépendances inter projets
+			// - EXECUTABLE = "executable" : exécutable           <= non pris en compte pour les dépendances inter projets
+			// - PLUGIN = "plugin"         : plugin maven         <= non pris en compte pour les dépendances inter projets
+			if (!binding.equals(Library.JNI) && !binding.equals(Library.EXECUTABLE) && !binding.equals(Library.PLUGIN)) {
 
 				// build library name : artifactId-version
 				String artifactId = narArtifact.getArtifactId();

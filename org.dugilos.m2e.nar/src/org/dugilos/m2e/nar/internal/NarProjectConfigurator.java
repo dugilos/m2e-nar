@@ -68,6 +68,8 @@ import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
 import org.eclipse.m2e.core.project.configurator.AbstractBuildParticipant;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
+import org.eclipse.m2e.core.project.configurator.ILifecycleMappingConfiguration;
+import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 import org.eclipse.m2e.core.project.configurator.ProjectConfigurationRequest;
 
 import com.github.maven_nar.NarUtil;
@@ -139,6 +141,13 @@ public class NarProjectConfigurator extends AbstractProjectConfigurator {
 			// Update the CDT configuration from the maven configuration
 			setProjectSpecificConfiguration(project, mavenProject, narPluginConfiguration, monitor, log);
 		}
+	}
+
+	@Override
+	public boolean hasConfigurationChanged(IMavenProjectFacade newFacade,
+			ILifecycleMappingConfiguration oldProjectConfiguration, MojoExecutionKey key, IProgressMonitor monitor) {
+		// TODO Auto-generated method stub
+		return super.hasConfigurationChanged(newFacade, oldProjectConfiguration, key, monitor);
 	}
 
 	/**
