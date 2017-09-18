@@ -30,7 +30,7 @@
 								<artifactItem>
 									<groupId>com.github.maven-nar</groupId>
 									<artifactId>nar-maven-plugin</artifactId>
-									<version>3.5.0</version>
+									<version>3.5.2</version>
 									<type>jar</type>
 									<overWrite>false</overWrite>
 									<destFileName>nar-maven-plugin.jar</destFileName>

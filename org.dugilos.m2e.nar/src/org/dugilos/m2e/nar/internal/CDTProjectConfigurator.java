@@ -82,7 +82,7 @@ import com.github.maven_nar.OS;
  * @author jfblanc
  *
  */
-public class NarProjectConfigurator extends AbstractProjectConfigurator {
+public class CDTProjectConfigurator extends AbstractProjectConfigurator {
 
 	private static final String PLUGIN_ID = "org.dugilos.m2e.nar";
 	
@@ -150,8 +150,15 @@ public class NarProjectConfigurator extends AbstractProjectConfigurator {
 		return super.hasConfigurationChanged(newFacade, oldProjectConfiguration, key, monitor);
 	}
 
+	@Override
+	public void unconfigure(ProjectConfigurationRequest request, IProgressMonitor monitor) throws CoreException {
+		// TODO Auto-generated method stub
+		super.unconfigure(request, monitor);
+	}
+
 	/**
-	 * Add C and CC nature and create the cdt configuration if necessary.
+	 * Add C and CC nature, create the cdt configuration if necessary and tweak it for maven and for
+	 * the project.
 	 * 
 	 * @param project
 	 * @param monitor
@@ -448,6 +455,16 @@ public class NarProjectConfigurator extends AbstractProjectConfigurator {
 		return cdtConfiguration;
 	}
 
+	/**
+	 * Tweak the CDT project for maven and for the maven projet.
+	 * 
+	 * @param os
+	 * @param libraryType
+	 * @param debug
+	 * @param configDecription
+	 * @param narPluginConfiguration
+	 * @throws CoreException
+	 */
 	@SuppressWarnings("restriction")
 	private void tweakConfigurationForMaven(String os, String libraryType, boolean debug, ICConfigurationDescription configDecription, NarPluginConfiguration narPluginConfiguration) throws CoreException {
 		
@@ -495,8 +512,10 @@ public class NarProjectConfigurator extends AbstractProjectConfigurator {
 		// === "Behavior" tab ===
 		// --- "Build settings" panel ---
 		// Stop on first build error
+		configuration.getEditableBuilder().setStopOnError(true);
 		
 		// Enable parallel build
+		configuration.getEditableBuilder().setParallelBuildOn(false);
 		
 		// --- "Workbench Build Behavior" panel ---
 		// Build on resource save (Auto build)
@@ -939,7 +958,7 @@ public class NarProjectConfigurator extends AbstractProjectConfigurator {
 		CIncludePathEntry includePathEntry;
 		
 		// Note : libraries and libraries path are not useful as they are not used by the CDT editor (contrary to
-		// includes and macro which are used to check the code) and the compile and linking job will not be done by CDT
+		// includes and macro which are used to check the code) and the compile and linking job will be done by Maven
 		/*
 		List<ICLanguageSettingEntry> libraryPathEntries = new ArrayList<ICLanguageSettingEntry>();
 		CLibraryPathEntry libraryPathEntry;

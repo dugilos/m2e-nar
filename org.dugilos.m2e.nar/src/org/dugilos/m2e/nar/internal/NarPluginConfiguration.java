@@ -55,6 +55,12 @@ import com.github.maven_nar.NarManager;
 import com.github.maven_nar.NarProperties;
 import com.github.maven_nar.NarUtil;
 
+/**
+ * Classe permettant d'extraire et de fournir la configuration du plugin nar-maven-plugin dans le projet
+ * que l'on configure.
+ * 
+ * @author Jean-François Blanc
+ */
 public class NarPluginConfiguration {
 
 	private static final String NAR_MAVEN_PLUGIN_GROUPID = "com.github.maven-nar";
@@ -88,10 +94,6 @@ public class NarPluginConfiguration {
 
 		this.mavenProject = mavenProject;
 		this.pluginId = pluginId;
-
-		// extract local repository (containing nar files dependencies)
-		ProjectBuildingRequest buildingRequest = mavenProject.getProjectBuildingRequest();
-		ArtifactRepository artifactRepository = buildingRequest.getLocalRepository();
 
 		// extract project directories
 		absoluteProjectBaseDir = project.getLocation().toFile();
@@ -136,7 +138,11 @@ public class NarPluginConfiguration {
 				throw new CoreException(status);
 			}
 		}
-		
+
+		// extract local repository (containing nar files dependencies)
+		ProjectBuildingRequest buildingRequest = mavenProject.getProjectBuildingRequest();
+		ArtifactRepository artifactRepository = buildingRequest.getLocalRepository();
+
 		try {
 			narManager = new NarManager(log, artifactRepository, mavenProject, arch, os, linker);
 		} catch (MojoFailureException e) {
